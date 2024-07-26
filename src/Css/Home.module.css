@@ -1,3 +1,7 @@
+:root {
+  --distance: 1700%;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -177,5 +181,29 @@ index.css에서 <body>의 높이를 height: 1000vh로 만들고
   .top,
   .bot {
     grid-template-columns: 3fr 7fr;
-  }      
+  }     
+  
+  .top-right {
+    position: relative;
+  }
+  
+  .scroll {
+    position: absolute;
+    top: 10px;
+    right: 0;
+    animation: scroll 4s ease-out infinite;
+  }
+
+  @keyframes scroll {
+    0% { 
+      transform: translateY(0);
+      opacity: 1; 
+    }
+    100% { 
+      /* 처음에는 그냥 기본값으로 1700% */
+      transform: translateY(var(--distance));
+      opacity: 0;
+    }
+  }
+
 }

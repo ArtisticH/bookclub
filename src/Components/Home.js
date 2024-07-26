@@ -1,51 +1,154 @@
-import React from 'react';
-import styles from '../Css/Home.module.css';
-import classNames from 'classnames/bind';
-import { Link } from 'react-router-dom';
-import Icons from '../Img/Icon';
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import styles from "../Css/Home.module.css";
+import classNames from "classnames/bind";
+import { Link } from "react-router-dom";
+import Icons from "../Img/Icon";
 
-const cx = classNames.bind(styles)
+const cx = classNames.bind(styles);
+
+const gradient = [
+  "linear-gradient(to top, #fff1eb 0%, #3fa7f3 100%)",
+  "linear-gradient(to top, #fff1eb 0%, #edd649 100%)",
+  "linear-gradient(to top, #fff1eb 0%, #99d1a2 100%)",
+  "linear-gradient(to top, #fff1eb 0%, #dd504b 100%)",
+];
+const background = ["#0c3aa5", "#f1ca0b", "#039754", "#ab181b"];
+const title = ["Books", "Members", "WISHLIST", "Fun"];
+
+const TopLeft = ({ index }) => {
+  return (
+    <div className={cx("top-left")}>
+      <Link to="/" className={cx("left-title")}>
+        Book Club
+      </Link>
+      <div className={cx("btns")}>
+        <div
+          className={cx("btn")}
+          style={{ backgroundColor: background[index] }}
+        >
+          LOG IN
+        </div>
+        <div
+          className={cx("btn")}
+          style={{ backgroundColor: background[index] }}
+        >
+          SIGN UP
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const LogIn = () => {
+
+}
+
+const SignUp = () => {
+
+}
+
+const BotLeft = ({ index }) => {
+  return (
+    <div
+      className={cx("bot-left")}
+      style={{ backgroundColor: background[index] }}
+    ></div>
+  );
+};
+
+const BotRight = () => {
+  return (
+    <div className={cx("bot-right")}>
+      <div className={cx("name")}>Seo Hanna</div>
+      <div className={cx("name")}>Kim Jung Gyeong</div>
+      <div className={cx("name")}>Kang Yelim</div>
+      <div className={cx("name")}>Kim Hyuna</div>
+    </div>
+  );
+};
+
+const TopRight = ({ index }) => {
+  const Right = useRef(null);
+  const Scroll = useRef(null);
+  useEffect(() => {
+    const distance = Right.current.offsetHeight - Scroll.current.offsetHeight - 10;
+    document.documentElement.style.setProperty('--distance', distance + 'px');
+  }, []);
+  return (
+    <div
+      className={cx("top-right")}
+      style={{ backgroundImage: gradient[index] }}
+      ref={Right}
+    >
+      <div className={cx("right-titles")}>
+        <Link to={`/${title[index].toLowerCase()}`} className={cx("right-title")}>
+          {title[index]}
+        </Link>
+        <Link to={`/${title[index].toLowerCase()}`} className={cx("right-title", "italic")}>
+        {title[index]}
+        </Link>
+      </div>
+      <div className={cx("top-right-bot")}>
+        <Link to={`/${title[index].toLowerCase()}`} className={cx("arrow")}>
+          <img className={cx("img")} src={Icons.arrow.rightBlack} alt="arrow" />
+        </Link>
+        <div className={cx("number-text")}>
+          <div className={cx("numbers")}>
+            <div>{index + 1}</div>
+            <div>/</div>
+            <div>4</div>
+          </div>
+          <div className={cx("scroll")} ref={Scroll}>Scroll</div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const Home = () => {
+  const [range, setRange] = useState({
+    start: null,
+    end: null,
+  });
+  const [step, setStep] = useState(null);
+  const [index, setIndex] = useState(0);
+
+  const scrollHandler = (e) => {
+    if (window.pageYOffset >= range.start && window.pageYOffset < range.end) {
+      setIndex((index) =>
+        Math.floor((window.pageYOffset - range.start) / step)
+      );
+    }
+  };
+  // range -> step 순으로 상태 업데이트, 그리고
+  // step까지 값이 채워져야 스크롤 함수가 오류 없이 작동
+  useEffect(() => {
+    setRange((obj) => ({
+      start: document.body.offsetTop + 400,
+      end: document.body.offsetHeight - document.documentElement.clientHeight,
+    }));
+  }, []);
+
+  useEffect(() => {
+    setStep((range.end - range.start) / 4);
+  }, [range]);
+
+  useEffect(() => {
+    if (step) {
+      window.addEventListener("scroll", scrollHandler);
+    }
+  }, [step]);
+
   return (
-    <div className={cx('home')}>
-      <div className={cx('sticky')}>
-        <div className={cx('top')}>
-          <div className={cx('top-left')}>
-            <Link to="/" className={cx('left-title')}>Book Club</Link>
-            <div className={cx('btns')}>
-              <div className={cx('btn')}>LOG IN</div>
-              <div className={cx('btn')}>SIGN UP</div>
-            </div>
-          </div>
-          <div className={cx('top-right')}>
-            <div className={cx('right-titles')}>
-              <Link to="/books" className={cx('right-title')}>Books.</Link>
-              <Link to="/books"  className={cx('right-title', 'italic')}>Books.</Link>
-            </div>
-            <div className={cx('top-right-bot')}>
-              <Link to="/books" className={cx('arrow')}>
-                <img className={cx('img')} src={Icons.arrow.rightBlack} alt="arrow"/>
-              </Link>
-              <div className={cx('number-text')}>
-                <div className={cx('numbers')}>
-                  <div>1</div>
-                  <div>/</div>
-                  <div>5</div>
-                </div>
-                <div className={cx('scroll')}>Scroll</div>
-              </div>
-            </div>
-          </div>
+    <div className={cx("home")}>
+      <div className={cx("sticky")}>
+        <div className={cx("top")}>
+          <TopLeft index={index} />
+          <TopRight index={index} />
         </div>
-        <div className={cx('bot')}>
-          <div className={cx('bot-left')}></div>
-          <div className={cx('bot-right')}>
-            <div className={cx('name')}>Seo Hanna</div>
-            <div className={cx('name')}>Kim Jung Gyeong</div>
-            <div className={cx('name')}>Kang Yelim</div>
-            <div className={cx('name')}>Kim Hyuna</div>
-          </div>
+        <div className={cx("bot")}>
+          <BotLeft index={index} />
+          <BotRight />
         </div>
       </div>
     </div>
