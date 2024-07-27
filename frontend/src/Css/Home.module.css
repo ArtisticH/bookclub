@@ -1,0 +1,309 @@
+/*
+index.css에서 <body>의 높이를 height: 1000vh로 만들고
+그리고 다시 .home을 1000vh, 
+그리고 .sticky를 position: sticky, height: 100vh로 해야..
+
+그냥 바닐라처럼  <body> 다음 <sticky>가 아니기 때문에
+사이에 <div id="root">가 있음
+*/ 
+
+.home {
+  height: 1000vh;
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  left: 0;
+  height: 100vh;
+}
+
+.top,
+.bot {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.top {
+  height: 70%;
+  /* .form에 대해서 */
+  position: relative;
+}
+
+.bot {
+  height: 30%;
+}
+
+.top-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.left-title {
+  height: 45%;
+  display: flex;
+  align-items: flex-end;
+  padding-left: 10px;
+  font-size: 2rem;
+  font-weight: 500;
+  letter-spacing: -2px;
+  font-family: var(--font-montserrat);
+}
+
+.btns {
+  height: 35px;
+  display: grid;
+  grid-template-columns: 4fr 6fr;
+  gap: 10px;
+  margin: 0 10px 10px 10px;
+  max-width: 250px;
+}
+
+.btn {
+  background-color: #0c3aa5;
+  border: 0.5px solid black;
+  letter-spacing: -1px;
+  font-size: 1.2rem;
+  color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 10px;
+  cursor: pointer;
+  transition: color 0.2s ease-out;
+  font-family: var(--font-montserrat);
+}
+
+.btn:hover {
+  color: white;
+}
+
+.top-right {
+  overflow: hidden;
+  border: 1px solid black;
+  background-image: linear-gradient(to top, #fff1eb 0%, #3fa7f3 100%);
+}
+
+.right-titles {
+  height: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  align-items: flex-start;
+}
+
+.right-title {
+  margin-left: -15px;
+  font-family: var(--font-Merriweather);
+  font-size: 5rem;
+  letter-spacing: -5px;
+  line-height: 0.9;
+  cursor: pointer;
+}
+
+.right-title.italic {
+  font-style: italic;
+}
+
+.top-right-bot {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 50%;
+  padding-top: 15px;
+}
+
+.arrow {
+  width: 200px;
+  cursor: pointer;
+}
+
+.number-text {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 0px 10px 10px;
+}
+
+.numbers {
+  font-family: var(--font-montserrat);
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 40px;
+}
+
+.scroll {
+  font-family: var(--font-Merriweather);
+  font-size: 1.4rem;
+  animation: scroll 1s ease-out infinite alternate;
+}
+
+/* 위아래로 살짝 튀어오르는 효과 */
+@keyframes scroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-70%); }
+}
+
+.bot-left {
+  background-color: #0c3aa5;
+  border: 1px solid black;
+}
+
+.bot-right {
+  padding: 20px;
+}
+
+.name {
+  font-size: 1.4rem;
+  font-weight: 200;
+  letter-spacing: -0.5px;
+  margin-bottom: 7px;
+  font-family: var(--font-poppins);
+  line-height: 1;
+}
+
+.form {
+  /* .top에 대해 */
+  position: absolute;
+  background-color: white;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100vh;
+  transform: translate3d(-100%, 0, 0);
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease-out;
+  border-right: 0.5px solid black;
+}
+
+.form.visible {
+  transform: translate3d(0%, 0, 0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.cancel {
+  width: 25px;
+  height: 25px;
+  position: relative;
+  cursor: pointer;
+}
+
+.left,
+.right {
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background-color: black;
+  left: 0;
+  top: 50%;
+}
+
+.left {
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.right {
+  transform: translateY(-50%) rotate(-45deg);
+}
+
+.center {
+  height: calc(100% - 25px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.form-title {
+  font-weight: 400;
+  font-size: 1.7rem;
+  letter-spacing: -1.7px;
+  font-family: var(--font-montserrat);
+}
+
+.input {
+  outline: none;
+  display: block;
+  margin: 10px 0;
+}
+
+.input::placeholder {
+  font-family: var(--font-montserrat);
+  font-size: 1.3rem;
+  letter-spacing: -1.3px;
+}
+
+/* 공통점 */
+.common {
+  border: 1px solid black;
+  cursor: pointer;
+  width: 100%;
+  font-size: 1.3rem;
+  letter-spacing: -1.3px;
+  max-width: 250px;
+  padding: 10px;
+  font-family: var(--font-montserrat);
+}
+
+.button {
+  background-color: black;
+  color: white;
+}
+
+.kakao {
+  background-color: #fae100;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.naver {
+  background-color: #02bf3a;
+  color: white;
+  text-align: center;
+}
+
+@media all and (min-width: 650px) {
+  .top,
+  .bot {
+    grid-template-columns: 3fr 7fr;
+  }     
+  
+  .top-right {
+    position: relative;
+  }
+  
+  .scroll {
+    position: absolute;
+    top: 10px;
+    right: 0;
+    animation: scroll 4s ease-out infinite;
+  }
+
+  @keyframes scroll {
+    0% { 
+      transform: translateY(0);
+      opacity: 1; 
+    }
+    100% { 
+      /* 처음에는 그냥 기본값으로 1700% */
+      transform: translateY(var(--distance));
+      opacity: 0;
+    }
+  }
+
+  .form {
+    width: 30%;
+  }
+}
