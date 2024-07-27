@@ -24,6 +24,7 @@ code {
 :root {
   --height: 70px;
   --distance: 1700%;
+  --final-width: 280px;
   --font-Merriweather: "Merriweather", serif;
   --font-poppins: "Poppins", sans-serif;
   --font-montserrat: "Montserrat", sans-serif;
@@ -46,3 +47,11 @@ a {
   display: block;
   width: 100%;
 }
+
+@media all and (min-width: 1200px) { 
+  :root {
+    --final-width: 330px;
+  }
+}
+
+

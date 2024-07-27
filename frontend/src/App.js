@@ -1,6 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import Books from './Components/Books';
-import Category from './Components/Cateory';
+import Tournament from './Components/Tournament';
 import Favorite from './Components/Favorite';
 import Fun from './Components/Fun';
 import Home from './Components/Home';
@@ -12,7 +12,7 @@ function App() {
       <Route path="/books" element={<Books />}/>
       <Route path="/fun" element={<Fun />}/>
       <Route path="/favorite" element={<Favorite />}/>
-      <Route path="/favorite/:id/:round" element={<Category />}/>
+      <Route path="/favorite/:id/:round" element={<Tournament />}/>
     </Routes>
   );
 }
