@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import styles from "../Css/Favorite.module.css";
 import classNames from "classnames/bind";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 
 const cx = classNames.bind(styles);
 
@@ -107,23 +106,9 @@ const Round = ({ round }) => {
   );
 };
 
-const Favorite = () => {
-  const [categories, setCategories] = useState([]);
+const Favorite = ({ categories, loading }) => {
   const [categoryId, setCategoryId] = useState(null);
   const [modal, setModal] = useState(false);
-
-  useEffect(() => {
-    document.body.style.height = "100vh";
-    const getCategories = async () => {
-      try {
-        const res = await axios.get("/favorite");
-        setCategories(res.data);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-      }
-    };
-    getCategories();
-  }, []);
 
   const showModal = useCallback((e) => {
     setModal(true);
@@ -137,30 +122,39 @@ const Favorite = () => {
     setCategoryId(id);
   }, []);
 
+  useEffect(() => {
+    document.body.style.height = "100vh";
+  }, []);
+
   return (
     <>
-      <div className={cx("favorite")}>
-        <img
-          className={cx("backgroud")}
-          src="/img/favorite/background.jpeg"
-          alt="background"
-        />
-        <div className={cx("title")}>Favorite</div>
-        <Link className={cx("home")} to="/">
-          HOME
-        </Link>
-        <div className={cx("grid")}>
-          {categories.map((category) => (
-            <Category
-              key={category.id}
-              category={category}
-              showModal={showModal}
-              whichCategory={whichCategory}
+      {loading && <div className={cx("loading")}>로딩중...</div>}
+      {!loading && categories && (
+        <>
+          <div className={cx("favorite")}>
+            <img
+              className={cx("backgroud")}
+              src="/img/favorite/background.jpeg"
+              alt="background"
             />
-          ))}
-        </div>
-      </div>
-      {modal && <Modal closeModal={closeModal} categoryId={categoryId} />}
+            <div className={cx("title")}>Favorite</div>
+            <Link className={cx("home")} to="/">
+              HOME
+            </Link>
+            <div className={cx("grid")}>
+              {categories.map((category) => (
+                <Category
+                  key={category.id}
+                  category={category}
+                  showModal={showModal}
+                  whichCategory={whichCategory}
+                />
+              ))}
+            </div>
+          </div>
+          {modal && <Modal closeModal={closeModal} categoryId={categoryId} />}
+        </>
+      )}
     </>
   );
 };
