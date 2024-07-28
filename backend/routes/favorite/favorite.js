@@ -60,6 +60,7 @@ router.get('/ranking/:id', async (req, res) => {
 router.get('/:id/:round', async (req, res) => {
   try {
     const id = req.params.id;
+    console.log(id);
     const model = await Favorite.findOne({
       where: { id },
       attributes: ['modelName', 'title', 'types', 'explanation'],

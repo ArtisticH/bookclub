@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
 import styles from "../Css/Tournament.module.css";
 import classNames from "classnames/bind";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import { Link } from "react-router-dom";
+import { produce } from "immer";
 
 const cx = classNames.bind(styles);
 
@@ -64,138 +64,199 @@ const Icon = ({ types }) => {
   );
 };
 
-const Round = ({ exp }) => {
+const Round = ({ state }) => {
+  const { current, total, info: { exp } } = state;
   return (
     <div className={cx("round")}>
       <div className={cx("round-number")}>
-        <span className={cx("round-current")}></span>&nbsp;/&nbsp;
-        <span className={cx("round-total")}></span>
+        <span className={cx("round-current")}>{current}</span>&nbsp;/&nbsp;
+        <span className={cx("round-total")}>{total}</span>
       </div>
       <div className={cx("exp")}>{exp}</div>
     </div>
   );
 };
 
-const TopImg = () => {
+const TopImg = ({ state }) => {
+  const { main, index, info: { model } } = state;
   return (
     <div className={cx("top-img")}>
       <div className={cx("img-box", "top")}>
-        <img className={cx("img")} src="" alt="img" />
+        <img className={cx("img")} src={`/img/${model}/${main[index]}.jpeg`} alt="img" />
       </div>
     </div>
   );
 };
 
-const TopInfo = ({ types }) => {
+const TopInfo = ({ state }) => {
+  const { info: { types, model }, main, sub, index } = state
   return (
     <div className={cx("top-info")}>
-      {types === 'music' &&
-      <>
-      <audio className={cx("audio")} src=""></audio>
-      <div className={cx("play")}>
-        <img className={cx("img")} src="/img/icon/play.png" alt="play" />
-      </div>
-      <div className={cx("pause")} hidden>
-        <img className="tournament-img" src="/img/icon/pause.png" alt="pause" />
-      </div>
-      </>
-      }
-      <div className={cx("main")}></div>
-      <div className={cx("sub")}></div>
+      {types === "music" && (
+        <>
+          <audio className={cx("audio")} src={`/audio/${model}/${main[index]}.mp3`}></audio>
+          <div className={cx("play")}>
+            <img className={cx("img")} src="/img/icon/play.png" alt="play" />
+          </div>
+          <div className={cx("pause")} hidden>
+            <img
+              className="tournament-img"
+              src="/img/icon/pause.png"
+              alt="pause"
+            />
+          </div>
+        </>
+      )}
+      <div className={cx("main")}>{main[index]}</div>
+      <div className={cx("sub")}>{sub[index]}</div>
     </div>
   );
 };
 
-const BotImg = () => {
+const BotImg = ({ state }) => {
+  const { main, index, info: { model } } = state;
   return (
     <div className={cx("bot-img")}>
       <div className={cx("img-box", "bot")}>
-        <img className={cx("img")} src="" alt="img" />
+        <img className={cx("img")} src={`/img/${model}/${main[index + 1]}.jpeg`} alt="img" />
       </div>
     </div>
   );
 };
 
-const BotInfo = ({ types }) => {
+const BotInfo = ({ state }) => {
+  const { info: { types, model }, main, sub, index } = state
   return (
     <div className={cx("bot-info")}>
-      {types === 'music' &&
-      <>
-      <audio className={cx("audio")} src=""></audio>
-      <div className={cx("play")}>
-        <img className={cx("img")} src="/img/icon/play.png" alt="play" />
-      </div>
-      <div className={cx("pause")} hidden>
-        <img className="tournament-img" src="/img/icon/pause.png" alt="pause" />
-      </div>
-      </>
-      }
-      <div className={cx("main")}></div>
-      <div className={cx("sub")}></div>
+      {types === "music" && (
+        <>
+          <audio className={cx("audio")} src={`/audio/${model}/${main[index + 1]}.mp3`}></audio>
+          <div className={cx("play")}>
+            <img className={cx("img")} src="/img/icon/play.png" alt="play" />
+          </div>
+          <div className={cx("pause")} hidden>
+            <img
+              className="tournament-img"
+              src="/img/icon/pause.png"
+              alt="pause"
+            />
+          </div>
+        </>
+      )}
+      <div className={cx("main")}>{main[index + 1]}</div>
+      <div className={cx("sub")}>{sub[index + 1]}</div>
     </div>
   );
 };
 
-const Battle = ({ original, info }) => {
+const tournamentState = {
+  index: 0,
+  final: false,
+  random: [],
+  original: [],
+  info: {},
+  main: [],
+  sub: [],
+  tem: {
+    main: [],
+    sub: [],
+    num: [],
+  },
+  current: 0,
+  total: 0,
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case "INIT":
+      return produce(state, (draft) => {
+        draft.original = JSON.parse(action.data.original);
+        draft.info = {
+          id: action.data.id,
+          title: action.data.title,
+          model: action.data.modelName,
+          types: action.data.types,
+          exp: action.data.explanation,
+        };
+        draft.random = makeRandom(action.round);
+        draft.current = 1;
+        draft.total = +action.round / 2;
+      });
+    case "SELECTED":
+      return produce(state, (draft) => {
+        draft.original.forEach((item) => {
+          item.selected++;
+        });
+      });
+    case "MAINSUB":
+      return produce(state, (draft) => {
+        draft.main = action.main;
+        draft.sub = action.sub;
+      });
+  }
+}
+
+const Battle = ({ state }) => {
+  const ClickTop = () => {
+    
+  }
   return (
     <div className={cx("battle")}>
-      <Icon types={info.types} />
-      <Round exp={info.exp}/>
-      <TopImg />
-      <TopInfo types={info.types}/>
-      <BotImg />
-      <BotInfo types={info.types}/>
+      <Icon types={state.info.types} />
+      <Round state={state} />
+      <TopImg state={state} />
+      <TopInfo state={state} />
+      <BotImg state={state} />
+      <BotInfo state={state} />
     </div>
   );
 };
 
-const Tournament = () => {
-  const params = useParams();
-  const id = params.id;
-  const round = params.round;
-  const [original, setOriginal] = useState([]);
-  const [info, setInfo] = useState({
-    id: null,
-    modelName: null,
-    title: null,
-    types: null,
-    exp: null,
-  });
+const makeRandom = (round) => {
+  const arr = Array.from({ length: 32 }, (_, i) => i); // 0부터 31까지 숫자 배열 생성
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]]; // 요소를 무작위로 섞음
+  }
+  return arr.slice(0, round); // 필요한 개수만큼 잘라서 반환
+};
 
+const Tournament = ({ category, loading, id, round }) => {
+  const [state, dispatch] = useReducer(reducer, tournamentState);
   useEffect(() => {
-    const startTournament = async () => {
-      try {
-        const res = await axios.get(`/favorite/${id}/${round}`);
-        setOriginal(JSON.parse(res.data.original));
-        setInfo((obj) => ({
-          id: res.data.id,
-          modelName: res.data.modelName,
-          title: res.data.title,
-          types: res.data.types,
-          exp: res.data.explanation,
-        }));
-      } catch (err) {
-        console.error("Error fetching data:", err);
-      }
-    };
-    startTournament();
-  }, []);
+    if (category && category.original) {
+      dispatch({ type: "INIT", data: category, round });
+      dispatch({ type: "SELECTED" });
+      const main = state.random.map((item) => {
+        return state.original[item].main;
+      });
+      const sub = state.random.map((item) => {
+        return state.original[item].sub;
+      });
+      dispatch({ type: "MAINSUB", main, sub });
+    }
+  }, [category]);
 
   return (
     <>
-      <div className={cx("tournament")}>
-        <img
-          className={cx("background")}
-          src="/img/favorite/background.jpeg"
-          alt="background"
-        />
-        <div className={cx("title")}>{info.title}</div>
-        <Link to="/" className={cx("home")}>
-          HOME
-        </Link>
-        <Battle original={original} info={info} />
-      </div>
-      {/* <Final id={id}/> */}
+      {loading && <div className={cx("loading")}>로딩중...</div>}
+      {!loading && category && category.original && (
+        <>
+          <div className={cx("tournament")}>
+            <img
+              className={cx("background")}
+              src="/img/favorite/background.jpeg"
+              alt="background"
+            />
+            <div className={cx("title")}>{state.info.title}</div>
+            <Link to="/" className={cx("home")}>
+              HOME
+            </Link>
+            <Battle state={state} />
+          </div>
+          {state.final && <Final id={id} />}
+        </>
+      )}
     </>
   );
 };

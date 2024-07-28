@@ -1,7 +1,7 @@
 import { handleActions } from "redux-actions";
 import axios from "axios";
 
-const GET_FAVORITE = "Favorite/GET_Favorite";
+const GET_FAVORITE = "Favorite/GET_FAVORITE";
 const GET_FAVORITE_SUCCESS = "Favorite/GET_FAVORITE_SUCCESS";
 const GET_FAVORITE_FAILURE = "Favorite/GET_FAVORITE_FAILURE";
 

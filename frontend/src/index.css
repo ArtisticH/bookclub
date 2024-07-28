@@ -48,6 +48,18 @@ a {
   width: 100%;
 }
 
+.loading {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-korean);
+  font-size: 1.5rem;
+  letter-spacing: -1.5px;
+  line-height: 1;
+}
+
 @media all and (min-width: 1200px) { 
   :root {
     --final-width: 330px;

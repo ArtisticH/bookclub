@@ -33,7 +33,7 @@ const Right = () => {
   return (
     <div>
       <div className={cx("head")}></div>
-      <div class={cx("projects")}>
+      <div className={cx("projects")}>
         <Link to="/favorite" className={cx("project")}>
           <div className={cx("project-title")}>
             01
