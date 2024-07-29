@@ -128,8 +128,7 @@
   grid-area: botinfo;
 }
 
-.play,
-.pause {
+.play {
   width: 25px;
   cursor: pointer;
   margin-bottom: 5px;
@@ -209,8 +208,7 @@
     letter-spacing: -10px;
   }  
 
-  .play,
-  .pause {
+  .play {
     width: 35px;
   }
 
@@ -225,7 +223,7 @@
   } 
 }
 
-.moal {
+.modal {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -292,12 +290,19 @@
 }
 
 .options {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 0;
+  background-color: #8e8f91;
+}
+
+.option {
   cursor: pointer;
-  margin: 0 10px;
+  margin: 0 40px;
   font-size: 1.3rem;
   font-family: var(--font-vt323);
   line-height: 1;
-  margin-right: 10px;
 }
 
 .option:hover {
