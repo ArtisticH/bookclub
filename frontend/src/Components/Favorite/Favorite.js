@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import styles from "../Css/Favorite.module.css";
+import styles from "../../Css/Favorite/Favorite.module.css";
 import classNames from "classnames/bind";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -133,7 +133,7 @@ const Favorite = ({ categories, loading }) => {
         <>
           <div className={cx("favorite")}>
             <img
-              className={cx("backgroud")}
+              className={cx("background")}
               src="/img/favorite/background.jpeg"
               alt="background"
             />

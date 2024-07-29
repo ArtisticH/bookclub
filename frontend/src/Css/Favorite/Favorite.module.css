@@ -3,16 +3,6 @@
   position: relative;
 }
 
-.backgroud {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: -1;
-  display: block;
-  height: 100%;
-  width: 100%;
-}
-
 .title {
   font-size: 7rem;
   letter-spacing: -10px;

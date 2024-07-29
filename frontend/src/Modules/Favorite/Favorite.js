@@ -9,7 +9,6 @@ export const getFavorite = () => async (dispatch) => {
   dispatch({ type: GET_FAVORITE });
   try {
     const response = await axios.get("/favorite");
-    console.log(response);
     dispatch({
       type: GET_FAVORITE_SUCCESS,
       payload: response.data,

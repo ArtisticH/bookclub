@@ -3,16 +3,6 @@
   position: relative;
 }
 
-.background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  z-index: -1;
-  display: block;
-}
-
 .title {
   font-family: var(--font-montserrat);
   font-size: 5rem;

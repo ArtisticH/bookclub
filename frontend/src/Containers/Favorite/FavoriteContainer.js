@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { connect } from "react-redux";
-import Favorite from "../Components/Favorite";
-import { getFavorite } from "../Modules/Favorite";
+import Favorite from "../../Components/Favorite/Favorite";
+import { getFavorite } from "../../Modules/Favorite/Favorite";
 
 const FavoriteContainer = ({ categories, loading, getFavorite }) => {
   useEffect(() => {

@@ -1,0 +1,149 @@
+.ranking {
+  min-height: 100vh;
+  position: relative;
+}
+
+.nav {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  font-family: var(--font-montserrat);
+}
+
+.title,
+.detail {
+  font-weight: 600;
+  line-height: 0.7;
+}
+
+.title {
+  font-size: 3rem;
+  letter-spacing: -5px;
+}
+
+.detail {
+  font-size: 5rem;
+  letter-spacing: -9px;
+}
+
+.links {
+  position: fixed;
+  top: 0;
+  right: 0;
+}
+
+.link {
+  font-size: 1.3rem;
+  letter-spacing: -2px;
+  line-height: 0.7;
+  margin-bottom: 1px;
+  text-align: end;
+}
+
+.list {
+  border: 0.5px solid black;
+  display: grid;
+  grid-template-columns: 150px auto;
+  width: 500px;
+}
+
+.img-box {
+  border-right: 0.5px solid black;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+.info-top {
+  display: grid;
+  grid-template-columns: 70px auto;
+  gap: 5px;
+}
+
+.rank {
+  font-family: var(--font-montserrat);
+  font-size: 4rem;
+  letter-spacing: -2px;
+  font-weight: 500;
+  line-height: 0.7;
+}
+
+.main {
+  font-family: var(--font-montserrat);
+  font-size: 1.4rem;
+  letter-spacing: -2px;
+}
+
+.sub {
+  font-family: var(--font-vt323);
+  font-size: 1.5rem;
+}
+
+.info-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.count-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.victory,
+.winning {
+  font-family: var(--font-korean);
+  font-size: 0.8rem;
+  letter-spacing: -0.5px;
+  font-weight: 300;
+}
+
+.victory-num,
+.winning-num {
+  line-height: 0.7;
+  font-family: var(--font-montserrat);
+  font-size: 3rem;
+  letter-spacing: -4px;
+}
+
+.terms,
+.term-box {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-korean);
+  font-size: 1rem;
+}
+
+.terms {
+  margin-top: 40px;
+}
+
+.term-text {
+  margin-right: 5px;
+}
+
+.term-exp {
+  font-weight: 200;
+}
+
+@media all and (min-width: 1000px) {
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .link {
+    font-size: 1.7rem;
+    letter-spacing: -3px;
+    line-height: 0.7;
+  }  
+
+  .terms {
+    padding: 0 20px;
+  }  
+}

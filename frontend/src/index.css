@@ -60,6 +60,17 @@ a {
   line-height: 1;
 }
 
+.background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+
 @media all and (min-width: 1200px) { 
   :root {
     --final-width: 330px;

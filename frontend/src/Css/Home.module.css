@@ -71,6 +71,7 @@ index.css에서 <body>의 높이를 height: 1000vh로 만들고
   justify-content: flex-start;
   padding-left: 10px;
   cursor: pointer;
+  max-height: 35px;
   transition: color 0.2s ease-out;
   font-family: var(--font-montserrat);
 }
@@ -272,6 +273,153 @@ index.css에서 <body>의 높이를 height: 1000vh로 만들고
   background-color: #02bf3a;
   color: white;
   text-align: center;
+}
+
+.card {
+  width: 300px;
+  height: 180px;
+  border: 1.5px solid black;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: fixed;
+  bottom: 20%;
+  left: 50px;
+  background-color: white;
+  padding: 10px;
+}
+
+.nick {
+  font-family: var(--font-korean);
+  font-size: 1.5rem;
+  font-weight: 100;
+  letter-spacing: -1.5px;
+  width: fit-content;
+}
+
+.user-wishlist,
+.logout {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-family: var(--font-poppins);
+}
+
+.user-wishlist-exp {
+  font-weight: 200;
+  font-size: 1.1rem;
+  letter-spacing: -1.1px;
+}
+
+.user-wishlist-title {
+  font-size: 1.9rem;
+  letter-spacing: -1.9px;
+  font-weight: 500;
+  line-height: 0.8;
+  color: #039754;
+  cursor: pointer;
+}
+
+.logout-link  {
+  font-size: 1.3rem;
+  letter-spacing: -1.3px;
+  font-weight: 200;
+  cursor: pointer;
+}
+
+.logout-link:hover {
+  font-weight: 600;
+}
+
+.wish {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  background-color: white;
+  border: 1px solid black;
+  z-index: 1001;
+}
+
+.wish-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 22px;
+  border-bottom: 1px solid black;
+  padding: 0 10px;
+  background-color: #039753;
+}
+
+.wish-title {
+  font-family: var(--font-montserrat);
+  font-size: 1rem;
+  letter-spacing: -1.5px;
+  font-weight: 300;
+}
+
+.wish-cancel {
+  width: 17px;
+  height: 17px;
+  position: relative;
+  cursor: pointer;
+}
+
+.wish-cancel-left,
+.wish-cancel-right {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 1px;
+  background-color: black;
+}
+
+.wish-cancel-left {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.wish-cancel-right {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.wish-form {
+  padding: 30px;
+}
+
+.wish-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+
+.wish-input {
+  margin-right: 5px;
+}
+
+.label {
+  font-family: var(--font-korean);
+  font-size: 0.9rem;
+  letter-spacing: -1px;
+  font-weight: 300;
+}
+
+.wish-submit {
+  font-family: var(--font-korean);
+  font-size: 0.8rem;
+  letter-spacing: -1px;
+  font-weight: 300;
+  height: 22px;
+  padding: 0 15px;
+  border: none;
+  outline: none;
+  border: 1px solid black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px auto 0 auto;
+  cursor: pointer;
 }
 
 @media all and (min-width: 650px) {

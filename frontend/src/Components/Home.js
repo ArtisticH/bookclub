@@ -1,7 +1,15 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import styles from "../Css/Home.module.css";
 import classNames from "classnames/bind";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { componentState, componentReducer } from "../Modules/Home";
 
 const cx = classNames.bind(styles);
 
@@ -14,35 +22,78 @@ const gradient = [
 const background = ["#0c3aa5", "#f1ca0b", "#039754", "#ab181b"];
 const title = ["Books", "Members", "WISHLIST", "Fun"];
 
-const TopLeft = ({ index, ClickLogIn, ClickSignUp }) => {
+const TopLeft = ({ login, state, dispatch }) => {
+  const { index } = state;
+  const ClickLogIn = useCallback(() => {
+    dispatch({ type: "FORM_LOGIN" });
+  }, []);
+
+  const ClickSignUp = useCallback(() => {
+    dispatch({ type: "FORM_SIGNUP" });
+  }, []);
+
   return (
     <div className={cx("top-left")}>
       <Link to="/" className={cx("left-title")}>
         Book Club
       </Link>
-      <div className={cx("btns")}>
-        <div
-          className={cx("btn")}
-          style={{ backgroundColor: background[index] }}
-          onClick={ClickLogIn}
-        >
-          LOG IN
+      {/* 로그인 안 했을때만 보인다. */}
+      {!login && (
+        <div className={cx("btns")}>
+          <div
+            className={cx("btn")}
+            style={{ backgroundColor: background[index] }}
+            onClick={ClickLogIn}
+          >
+            LOG IN
+          </div>
+          <div
+            className={cx("btn")}
+            style={{ backgroundColor: background[index] }}
+            onClick={ClickSignUp}
+          >
+            SIGN UP
+          </div>
         </div>
-        <div
-          className={cx("btn")}
-          style={{ backgroundColor: background[index] }}
-          onClick={ClickSignUp}
-        >
-          SIGN UP
-        </div>
-      </div>
+      )}
     </div>
   );
 };
 
-const LogIn = ({ logIn, CancelLogIn }) => {
+const LogInForm = ({ state, dispatch, LogIn }) => {
+  const {
+    form: { formLogin },
+  } = state;
+  const This = useRef(null);
+  const CancelLogIn = useCallback(() => {
+    dispatch({ type: "FORM_CANCEL_LOGIN" });
+  }, []);
+
+  const Submit = useCallback(async (e) => {
+    e.preventDefault();
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+    try {
+      const res = await axios.post("/auth/login", {
+        email,
+        password,
+      });
+      CancelLogIn();
+      const success = res.data.success;
+      if (success) {
+        LogIn(res.data.user);
+        alert("로그인 완료!");
+      } else {
+        const message = res.data.message;
+        alert(message);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
   return (
-    <div className={cx("form", { visible: logIn })}>
+    <div className={cx("form", { visible: formLogin })}>
       <div className={cx("nav")}>
         <div className={cx("cancel")} onClick={CancelLogIn}>
           <div className={cx("left")}></div>
@@ -51,7 +102,7 @@ const LogIn = ({ logIn, CancelLogIn }) => {
       </div>
       <div className={cx("center")}>
         <div className={cx("form-title")}>LOG IN</div>
-        <form method="post" action="/auth/login">
+        <form ref={This} onSubmit={Submit}>
           <input
             className={cx("input", "common")}
             name="email"
@@ -81,9 +132,42 @@ const LogIn = ({ logIn, CancelLogIn }) => {
   );
 };
 
-const SignUp = ({ signUp, CancelSignUp }) => {
+const SignUpForm = ({ state, dispatch }) => {
+  const {
+    form: { formSignup },
+  } = state;
+  const CancelSignUp = useCallback(() => {
+    dispatch({ type: "FORM_CANCEL_SIGNUP" });
+  }, []);
+
+  const This = useRef(null);
+
+  const Submit = useCallback(async (e) => {
+    e.preventDefault();
+    const email = e.target.email.value;
+    const nick = e.target.nick.value;
+    const password = e.target.password.value;
+    try {
+      const res = await axios.post("/auth/signup", {
+        email,
+        nick,
+        password,
+      });
+      CancelSignUp();
+      const success = res.data.success;
+      if (success) {
+        alert("회원가입 완료! 로그인을 진행해주세요.");
+      } else {
+        const message = res.data.message;
+        alert(message);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
   return (
-    <div className={cx("form", { visible: signUp })}>
+    <div className={cx("form", { visible: formSignup })}>
       <div className={cx("nav")}>
         <div className={cx("cancel")} onClick={CancelSignUp}>
           <div className={cx("left")}></div>
@@ -92,7 +176,7 @@ const SignUp = ({ signUp, CancelSignUp }) => {
       </div>
       <div className={cx("center")}>
         <div className={cx("form-title")}>SIGN UP</div>
-        <form method="post" action="/auth/signup">
+        <form ref={This} onSubmit={Submit}>
           <input
             className={cx("input", "common")}
             type="email"
@@ -122,7 +206,8 @@ const SignUp = ({ signUp, CancelSignUp }) => {
   );
 };
 
-const BotLeft = ({ index }) => {
+const BotLeft = ({ state }) => {
+  const { index } = state;
   return (
     <div
       className={cx("bot-left")}
@@ -131,7 +216,8 @@ const BotLeft = ({ index }) => {
   );
 };
 
-const TopRight = ({ index }) => {
+const TopRight = ({ state, dispatch }) => {
+  const { index } = state;
   const Right = useRef(null);
   const Scroll = useRef(null);
   useEffect(() => {
@@ -139,30 +225,61 @@ const TopRight = ({ index }) => {
       Right.current.offsetHeight - Scroll.current.offsetHeight - 10;
     document.documentElement.style.setProperty("--distance", distance + "px");
   }, []);
+
+  const ClickWishlist = useCallback(() => {
+    dispatch({ type: "SHOW_WISHLIST" });
+  }, []);
+
   return (
     <div
       className={cx("top-right")}
       style={{ backgroundImage: gradient[index] }}
       ref={Right}
     >
-      <div className={cx("right-titles")}>
-        <Link
-          to={`/${title[index].toLowerCase()}`}
-          className={cx("right-title")}
-        >
-          {title[index]}
-        </Link>
-        <Link
-          to={`/${title[index].toLowerCase()}`}
-          className={cx("right-title", "italic")}
-        >
-          {title[index]}
-        </Link>
-      </div>
+      {index === 2 ? ( // 위시리스트 선택창 보여주기
+        <div className={cx("right-titles")}>
+          <div className={cx("right-title")} onClick={ClickWishlist}>
+            {title[index]}
+          </div>
+          <div className={cx("right-title", "italic")} onClick={ClickWishlist}>
+            {title[index]}
+          </div>
+        </div>
+      ) : (
+        // 다른 페이지로 이동
+        <div className={cx("right-titles")}>
+          <Link
+            to={`/${title[index].toLowerCase()}`}
+            className={cx("right-title")}
+          >
+            {title[index]}
+          </Link>
+          <Link
+            to={`/${title[index].toLowerCase()}`}
+            className={cx("right-title", "italic")}
+          >
+            {title[index]}
+          </Link>
+        </div>
+      )}
       <div className={cx("top-right-bot")}>
-        <Link to={`/${title[index].toLowerCase()}`} className={cx("arrow")}>
-          <img className={cx("img")} src="/img/icon/right-black-arrow.png" alt="arrow" />
-        </Link>
+        {index === 2 ? (
+          <div className={cx("arrow")} onClick={ClickWishlist}>
+            <img
+              className={cx("img")}
+              src="/img/icon/right-black-arrow.png"
+              alt="arrow"
+            />
+          </div>
+        ) : (
+          <Link to={`/${title[index].toLowerCase()}`} className={cx("arrow")}>
+            <img
+              className={cx("img")}
+              src="/img/icon/right-black-arrow.png"
+              alt="arrow"
+            />
+          </Link>
+        )}
         <div className={cx("number-text")}>
           <div className={cx("numbers")}>
             <div>{index + 1}</div>
@@ -189,52 +306,108 @@ const BotRight = () => {
   );
 };
 
-const Home = () => {
-  const [range, setRange] = useState({
-    start: null,
-    end: null,
-  });
-  const [step, setStep] = useState(null);
-  const [index, setIndex] = useState(0);
-  const [logIn, setLogin] = useState(false);
-  const [signUp, setSignUp] = useState(false);
+const Card = ({ user, LogOut }) => {
+  const ClickLogOut = useCallback(async () => {
+    const res = await axios.get("/auth/logout");
+    const success = res.data.success;
+    if (success) {
+      LogOut();
+      alert("로그아웃이 완료되었습니다.");
+    }
+  }, []);
+  return (
+    <div className={cx("card")}>
+      <Link className={cx("nick")} to={`/members?member=${user.id}`}>
+        {user.nick}
+      </Link>
+      <div className={cx("user-wishlist")}>
+        <div className={cx("user-wishlist-exp")}>CHECK YOUR WISHLIST</div>
+        <Link to={`/wishlist/${user.id}`} className={cx("user-wishlist-title")}>
+          WISHLIST
+        </Link>
+      </div>
+      <div className={cx("logout")}>
+        <div onClick={ClickLogOut} className={cx("logout-link")}>
+          LOGOUT
+        </div>
+      </div>
+    </div>
+  );
+};
 
-  const ClickLogIn = useCallback(() => {
-    setLogin(true);
+const Wishlist = ({ members, dispatch }) => {
+  const navigate = useNavigate();
+  const ClickWishlist = useCallback(() => {
+    dispatch({ type: "CANCEL_WISHLIST" });
   }, []);
 
-  const ClickSignUp = useCallback(() => {
-    setSignUp(true);
-  }, []);
+  const Submit = useCallback((e) => {
+    e.preventDefault();
+    const id = e.target.wishlist.value;
+    ClickWishlist();
+    navigate(`/wishlist/${id}`);
+  }, [])
 
-  const CancelLogIn = useCallback(() => {
-    setLogin(false);
-  }, []);
+  return (
+    <div className={cx("wish")}>
+      <div className={cx("wish-nav")}>
+        <div className={cx("wish-title")}>WISHLIST</div>
+        <div className={cx("wish-cancel")} onClick={ClickWishlist}>
+          <div className={cx("wish-cancel-left")}></div>
+          <div className={cx("wish-cancel-right")}></div>
+        </div>
+      </div>
+      <form className={cx("wish-form")} onSubmit={Submit}>
+        <div className={cx("wish-grid")}>
+          {members.map((member) => (
+            <Member key={member.id} member={member} />
+          ))}
+        </div>
+        <input type="submit" value="선택" className={cx("wish-submit")} />
+      </form>
+    </div>
+  );
+};
 
-  const CancelSignUp = useCallback(() => {
-    setSignUp(false);
-  }, []);
+const Member = ({ member }) => {
+  return (
+    <div>
+      <input id={member.nick} type="radio" className={cx("wish-input")} name="wishlist" value={member.id} />
+      <label htmlFor={member.nick} className={cx("label")}>
+        {member.nick}
+      </label>
+    </div>
+  );
+};
+
+const Home = ({ user, loading, login, members, LogIn, LogOut }) => {
+  const [state, dispatch] = useReducer(componentReducer, componentState);
+  const {
+    range: { start, end },
+    step,
+    wishlist,
+  } = state;
 
   const scrollHandler = (e) => {
-    if (window.pageYOffset >= range.start && window.pageYOffset < range.end) {
-      setIndex((index) =>
-        Math.floor((window.pageYOffset - range.start) / step)
-      );
+    if (window.pageYOffset >= start && window.pageYOffset < end) {
+      dispatch({
+        type: "INDEX",
+        index: Math.floor((window.pageYOffset - start) / step),
+      });
     }
   };
-  // range -> step 순으로 상태 업데이트, 그리고
-  // step까지 값이 채워져야 스크롤 함수가 오류 없이 작동
+
   useEffect(() => {
-    document.body.style.height = '1000vh';
-    setRange((obj) => ({
-      start: document.body.offsetTop + 400,
-      end: document.body.offsetHeight - document.documentElement.clientHeight,
-    }));
+    document.body.style.height = "1000vh";
+    const offsetTop = document.body.offsetTop;
+    const offsetHeight = document.body.offsetHeight;
+    const browserHeight = document.documentElement.clientHeight;
+    dispatch({ type: "SET_RANGE", offsetTop, offsetHeight, browserHeight });
   }, []);
 
   useEffect(() => {
-    setStep((range.end - range.start) / 4);
-  }, [range]);
+    dispatch({ type: "SET_STEP" });
+  }, [start, end]);
 
   useEffect(() => {
     if (step) {
@@ -243,24 +416,38 @@ const Home = () => {
   }, [step]);
 
   return (
-    <div className={cx("home")}>
-      <div className={cx("sticky")}>
-        <div className={cx("top")}>
-          <TopLeft
-            index={index}
-            ClickLogIn={ClickLogIn}
-            ClickSignUp={ClickSignUp}
-          />
-          <LogIn logIn={logIn} CancelLogIn={CancelLogIn} />
-          <SignUp signUp={signUp} CancelSignUp={CancelSignUp} />
-          <TopRight index={index} />
-        </div>
-        <div className={cx("bot")}>
-          <BotLeft index={index} />
-          <BotRight />
-        </div>
-      </div>
-    </div>
+    <>
+      {loading && <div className={cx("loading")}>로딩중...</div>}
+      {!loading && (
+        <>
+          <div className={cx("home")}>
+            <div className={cx("sticky")}>
+              <div className={cx("top")}>
+                <TopLeft login={login} state={state} dispatch={dispatch} />
+                {/* 로그인 안한 경우에만 노출 */}
+                {!login && (
+                  <>
+                    <LogInForm
+                      state={state}
+                      dispatch={dispatch}
+                      LogIn={LogIn}
+                    />
+                    <SignUpForm state={state} dispatch={dispatch} />
+                  </>
+                )}
+                <TopRight state={state} dispatch={dispatch} />
+              </div>
+              <div className={cx("bot")}>
+                <BotLeft state={state} />
+                <BotRight />
+              </div>
+            </div>
+          </div>
+          {login && <Card user={user} LogOut={LogOut} />}
+          {wishlist && <Wishlist members={members} dispatch={dispatch} />}
+        </>
+      )}
+    </>
   );
 };
 

@@ -4,11 +4,11 @@ import React, {
   useReducer,
   useRef,
 } from "react";
-import styles from "../Css/Tournament.module.css";
+import styles from "../../Css/Favorite/Tournament.module.css"
 import classNames from "classnames/bind";
 import { Link } from "react-router-dom";
-import { produce } from "immer";
-import { tournamentState, reducer } from '../Modules/Tournament';
+import axios from "axios";
+import { tournamentState, reducer } from "../../Modules/Favorite/Tournament";
 
 const cx = classNames.bind(styles);
 
@@ -121,11 +121,6 @@ const TopImg = ({ state, dispatch }) => {
   const FinalClick = useCallback(() => {
     dispatch({ type: "FINAL_CLICKED", position: "top" });
   }, []);
-
-  useEffect(() => {
-    console.log(state);
-  }, [index]);
-
   return (
     <div className={cx("top-img")}>
       <div
@@ -217,10 +212,6 @@ const BotImg = ({ state, dispatch }) => {
     dispatch({ type: "FINAL_CLICKED", position: "bottom" });
   }, []);
 
-  useEffect(() => {
-    console.log(state);
-  }, [index]);
-
   return (
     <div className={cx("bot-img")}>
       <div
@@ -303,6 +294,18 @@ const Battle = ({ state, dispatch }) => {
     }
   }, [state.current]);
 
+  useEffect(() => {
+    const postResult = async () => {
+      await axios.post(`/favorite/final`, {
+        original: JSON.stringify(state.original),
+        modelName: state.info.model,
+      });
+    }
+    if(state.finalClicked) {
+      postResult();
+    }
+  }, [state.finalClicked])
+
   return (
     <div className={cx("battle")}>
       <Icon types={state.info.types} />
@@ -326,13 +329,6 @@ const Tournament = ({ category, loading, id, round }) => {
       dispatch({ type: "MAINSUB" });
     }
   }, [category]);
-
-  useEffect(() => {
-    if(state.finalClicked) {
-      console.log('지금')
-    }
-
-  }, [state.finalClicked])
 
   return (
     <>
