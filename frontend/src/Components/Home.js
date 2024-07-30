@@ -24,6 +24,8 @@ const title = ["Books", "Members", "WISHLIST", "Fun"];
 
 const TopLeft = ({ login, state, dispatch }) => {
   const { index } = state;
+  // formLogin과 formSignup값이 true가 되고
+  // <LogInForm>과 <SignUpForm>에서 클래스 조건부를 { visible: true }로 만들어 폼을 등장시킨다.
   const ClickLogIn = useCallback(() => {
     dispatch({ type: "FORM_LOGIN" });
   }, []);
@@ -38,6 +40,7 @@ const TopLeft = ({ login, state, dispatch }) => {
         Book Club
       </Link>
       {/* 로그인 안 했을때만 보인다. */}
+      {/* index에 따라 버튼 배경색이 바뀐다. */}
       {!login && (
         <div className={cx("btns")}>
           <div
@@ -60,15 +63,15 @@ const TopLeft = ({ login, state, dispatch }) => {
   );
 };
 
-const LogInForm = ({ state, dispatch, LogIn }) => {
+const LogInForm = ({ state, dispatch, LogIn, members }) => {
   const {
     form: { formLogin },
   } = state;
-  const This = useRef(null);
+  // formLogin = false;
   const CancelLogIn = useCallback(() => {
     dispatch({ type: "FORM_CANCEL_LOGIN" });
   }, []);
-
+  // 로그인을 진행할때
   const Submit = useCallback(async (e) => {
     e.preventDefault();
     const email = e.target.email.value;
@@ -78,12 +81,14 @@ const LogInForm = ({ state, dispatch, LogIn }) => {
         email,
         password,
       });
-      CancelLogIn();
+      CancelLogIn(); // 창을 없애고
       const success = res.data.success;
-      if (success) {
-        LogIn(res.data.user);
+      if (success) { // 성공했다면 루트 리듀서에 저장한 상태 변경
+        // 멤버들도 보내야함, 이제 user 상태에서 진짜 유저 데이터 정보를 쓸 수 있음.
+        LogIn(res.data.user, members);
         alert("로그인 완료!");
       } else {
+        // 실패했을경우 메세지 보여주기
         const message = res.data.message;
         alert(message);
       }
@@ -102,7 +107,7 @@ const LogInForm = ({ state, dispatch, LogIn }) => {
       </div>
       <div className={cx("center")}>
         <div className={cx("form-title")}>LOG IN</div>
-        <form ref={This} onSubmit={Submit}>
+        <form onSubmit={Submit}>
           <input
             className={cx("input", "common")}
             name="email"
@@ -139,9 +144,6 @@ const SignUpForm = ({ state, dispatch }) => {
   const CancelSignUp = useCallback(() => {
     dispatch({ type: "FORM_CANCEL_SIGNUP" });
   }, []);
-
-  const This = useRef(null);
-
   const Submit = useCallback(async (e) => {
     e.preventDefault();
     const email = e.target.email.value;
@@ -176,7 +178,7 @@ const SignUpForm = ({ state, dispatch }) => {
       </div>
       <div className={cx("center")}>
         <div className={cx("form-title")}>SIGN UP</div>
-        <form ref={This} onSubmit={Submit}>
+        <form onSubmit={Submit}>
           <input
             className={cx("input", "common")}
             type="email"
@@ -221,11 +223,13 @@ const TopRight = ({ state, dispatch }) => {
   const Right = useRef(null);
   const Scroll = useRef(null);
   useEffect(() => {
+    // css값 설정
     const distance =
       Right.current.offsetHeight - Scroll.current.offsetHeight - 10;
     document.documentElement.style.setProperty("--distance", distance + "px");
   }, []);
-
+  // wishlist타이틀이나 화살표 선택시 라우트 이동이 아니라 멤버 선택 창을 보여준다.
+  // 그러면 <Home>에서 wishlist값의 변화로 <Wishlist>가 보여진다. 
   const ClickWishlist = useCallback(() => {
     dispatch({ type: "SHOW_WISHLIST" });
   }, []);
@@ -306,32 +310,40 @@ const BotRight = () => {
   );
 };
 
-const Card = ({ user, LogOut }) => {
+const Card = ({ user, LogOut, members }) => {
   const ClickLogOut = useCallback(async () => {
     const res = await axios.get("/auth/logout");
     const success = res.data.success;
     if (success) {
-      LogOut();
+      LogOut(members);
       alert("로그아웃이 완료되었습니다.");
     }
   }, []);
+
   return (
-    <div className={cx("card")}>
-      <Link className={cx("nick")} to={`/members?member=${user.id}`}>
-        {user.nick}
-      </Link>
-      <div className={cx("user-wishlist")}>
-        <div className={cx("user-wishlist-exp")}>CHECK YOUR WISHLIST</div>
-        <Link to={`/wishlist/${user.id}`} className={cx("user-wishlist-title")}>
-          WISHLIST
-        </Link>
-      </div>
-      <div className={cx("logout")}>
-        <div onClick={ClickLogOut} className={cx("logout-link")}>
-          LOGOUT
+    <>
+      {user && user.id && ( // 로그인을 해서 유저 값이 있는 경우에만
+        <div className={cx("card")}>
+          <Link className={cx("nick")} to={`/members?member=${user.id}`}>
+            {user.nick}
+          </Link>
+          <div className={cx("user-wishlist")}>
+            <div className={cx("user-wishlist-exp")}>CHECK YOUR WISHLIST</div>
+            <Link
+              to={`/wishlist/${user.id}`}
+              className={cx("user-wishlist-title")}
+            >
+              WISHLIST
+            </Link>
+          </div>
+          <div className={cx("logout")}>
+            <div onClick={ClickLogOut} className={cx("logout-link")}>
+              LOGOUT
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 
@@ -346,7 +358,7 @@ const Wishlist = ({ members, dispatch }) => {
     const id = e.target.wishlist.value;
     ClickWishlist();
     navigate(`/wishlist/${id}`);
-  }, [])
+  }, []);
 
   return (
     <div className={cx("wish")}>
@@ -372,7 +384,13 @@ const Wishlist = ({ members, dispatch }) => {
 const Member = ({ member }) => {
   return (
     <div>
-      <input id={member.nick} type="radio" className={cx("wish-input")} name="wishlist" value={member.id} />
+      <input
+        id={member.nick}
+        type="radio"
+        className={cx("wish-input")}
+        name="wishlist"
+        value={member.id}
+      />
       <label htmlFor={member.nick} className={cx("label")}>
         {member.nick}
       </label>
@@ -381,6 +399,7 @@ const Member = ({ member }) => {
 };
 
 const Home = ({ user, loading, login, members, LogIn, LogOut }) => {
+  // 컴포넌트 내에서 사용할 상태와 디스패치
   const [state, dispatch] = useReducer(componentReducer, componentState);
   const {
     range: { start, end },
@@ -389,6 +408,8 @@ const Home = ({ user, loading, login, members, LogIn, LogOut }) => {
   } = state;
 
   const scrollHandler = (e) => {
+    // 현재 스크롤 위치에 따라 인덱스가 정해지고
+    // 그 인덱스에 따라 배경이나 타이틀 등이 바뀐다. 
     if (window.pageYOffset >= start && window.pageYOffset < end) {
       dispatch({
         type: "INDEX",
@@ -402,20 +423,25 @@ const Home = ({ user, loading, login, members, LogIn, LogOut }) => {
     const offsetTop = document.body.offsetTop;
     const offsetHeight = document.body.offsetHeight;
     const browserHeight = document.documentElement.clientHeight;
+    // 범위 즉 시작과 끝을 정한다. 
     dispatch({ type: "SET_RANGE", offsetTop, offsetHeight, browserHeight });
   }, []);
 
   useEffect(() => {
+    // 시작과 끝이 정해지면 구간을 정한다. 
     dispatch({ type: "SET_STEP" });
   }, [start, end]);
 
   useEffect(() => {
+    // 스텝이 정해지면 이벤트를 등록한다. 
     if (step) {
       window.addEventListener("scroll", scrollHandler);
     }
   }, [step]);
 
   return (
+    // 로딩중이면 로딩중이라고 표시
+    // 로딩이 끝나면 화면 표시
     <>
       {loading && <div className={cx("loading")}>로딩중...</div>}
       {!loading && (
@@ -431,6 +457,7 @@ const Home = ({ user, loading, login, members, LogIn, LogOut }) => {
                       state={state}
                       dispatch={dispatch}
                       LogIn={LogIn}
+                      members={members}
                     />
                     <SignUpForm state={state} dispatch={dispatch} />
                   </>
@@ -443,7 +470,8 @@ const Home = ({ user, loading, login, members, LogIn, LogOut }) => {
               </div>
             </div>
           </div>
-          {login && <Card user={user} LogOut={LogOut} />}
+          {/* 로그인 한 경우에만 노출 */}
+          {login && <Card user={user} LogOut={LogOut} members={members}/>}
           {wishlist && <Wishlist members={members} dispatch={dispatch} />}
         </>
       )}

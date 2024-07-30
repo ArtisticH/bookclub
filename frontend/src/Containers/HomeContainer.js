@@ -4,6 +4,9 @@ import Home from "../Components/Home";
 import { getHome, LogIn, LogOut } from "../Modules/Home";
 
 const HomeContainer = ({ user, loading, login, members, getHome, LogIn, LogOut }) => {
+  // user, loading, login, members는 상태 데이터
+  // getHome는 컨테이너 마운트할때 처음에 호출하는 비동기 함수
+  // LogIn, LogOut은 컴포넌트 내에서 루트 리듀서에 저장된 상태를 바꿀때 쓴다. 
   useEffect(() => {
     getHome();
   }, [getHome]);

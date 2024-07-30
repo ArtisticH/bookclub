@@ -39,8 +39,8 @@ const getHome = () => async (dispatch) => {
   }
 };
 // 하위 컴포넌트에서 상태를 바꿀 수 있는 방법
-const LogIn = (user) => ({ type: LOGIN, payload: user });
-const LogOut = () => ({ type: NOT_LOGIN });
+const LogIn = (user, members) => ({ type: LOGIN, payload: { user, members } });
+const LogOut = (members) => ({ type: NOT_LOGIN, payload: { members } });
 
 const containerState = {
   loading: false,
