@@ -1,17 +1,19 @@
 import { Route, Routes } from 'react-router-dom'
-import Books from './Components/Book/Books';
+import HomeContainer from './Containers/HomeContainer';
+import BooksContainer from './Containers/Book/BooksContainer';
+import BookContainer from './Containers/Book/BookContainer';
 import TournamentContainer from './Containers/Favorite/TournamentContainer';
 import FavoriteContainer from './Containers/Favorite/FavoriteContainer';
 import RankingContainer from './Containers/Favorite/RankingContainer';
 import Quotes from './Components/Quotes';
 import Fun from './Components/Fun';
-import HomeContainer from './Containers/HomeContainer';
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<HomeContainer />}/>
-      <Route path="/books" element={<Books />}/>
+      <Route path="/books" element={<BooksContainer />}/>
+      <Route path="/books/:id" element={<BookContainer />}/>
       <Route path="/fun" element={<Fun />}/>
       <Route path="/favorite" element={<FavoriteContainer />}/>
       <Route path="/favorite/:id/:round" element={<TournamentContainer />}/>
