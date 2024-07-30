@@ -6,13 +6,13 @@ import { componentState, componentReducer } from "../../Modules/Book/Book";
 
 const cx = classNames.bind(styles);
 
-const Left = ({ book }) => {
-  const { book: thatBook, totalBook, starArr, starNum, member } = book;
+const Left = ({ data }) => {
+  const { book, totalBook, starArr, starNum, member } = data;
   return (
     <div className={cx("left")}>
-      <LeftNav thatBook={thatBook} totalBook={totalBook} />
+      <LeftNav book={book} totalBook={totalBook} />
       <LeftBook
-        thatBook={thatBook}
+        book={book}
         starArr={starArr}
         starNum={starNum}
         member={member}
@@ -21,10 +21,10 @@ const Left = ({ book }) => {
   );
 };
 
-const LeftNav = ({ thatBook, totalBook }) => {
+const LeftNav = ({ book, totalBook }) => {
   return (
     <>
-      {thatBook && (
+      {book && (
         <>
           <div className={cx("links")}>
             <Link to="/books" style={{ width: "70px" }}>
@@ -37,7 +37,7 @@ const LeftNav = ({ thatBook, totalBook }) => {
           <div className={cx("nav")}>
             <div className={cx("nav-text")}>Book</div>
             <div style={{ fontSize: "1.2rem" }}>
-              <span>{thatBook.id}</span>&nbsp;/&nbsp;<span>{totalBook}</span>
+              <span>{book.id}</span>&nbsp;/&nbsp;<span>{totalBook}</span>
             </div>
           </div>
         </>
@@ -46,17 +46,17 @@ const LeftNav = ({ thatBook, totalBook }) => {
   );
 };
 
-const LeftBook = ({ thatBook, starArr, starNum, member }) => {
+const LeftBook = ({ book, starArr, starNum, member }) => {
   return (
     <div className={cx("left-main")}>
       <div className={cx("left-grid")}>
         <div className={cx("book-img")}>
-          <img className={cx("img")} src={thatBook.img} alt="book-img" />
+          <img className={cx("img")} src={book.img} alt="book-img" />
         </div>
         <div className={cx("book-info")}>
-          <div className={cx("book-title")}>{thatBook.title}</div>
+          <div className={cx("book-title")}>{book.title}</div>
           <div>
-            <div className={cx("author")}>{thatBook.author}</div>
+            <div className={cx("author")}>{book.author}</div>
             <div className={cx("recommender-box")}>
               <span>추천이:&nbsp;</span>
               <Link
@@ -68,7 +68,7 @@ const LeftBook = ({ thatBook, starArr, starNum, member }) => {
             </div>
             <div className={cx("date-box")}>
               <span>모임 날짜:&nbsp;</span>
-              <span className={cx("date")}>{thatBook.meetingDate}</span>
+              <span className={cx("date")}>{book.meetingDate}</span>
             </div>
           </div>
           <div className={cx("rate-box")}>
@@ -90,34 +90,159 @@ const LeftBook = ({ thatBook, starArr, starNum, member }) => {
   );
 };
 
-const Right = ({ book, dispatch }) => {
-  const { totalReview } = book;
+const Right = ({ data, dispatch }) => {
+  const { totalReview, reviews, user } = data;
 
   return (
     <div className={cx("right")}>
-      <RightNav dispatch={dispatch} totalReview={totalReview}/>
+      <RightNav dispatch={dispatch} totalReview={totalReview} />
+      <Empty />
+      <Container reviews={reviews} user={user} />
+      <Pagenation />
     </div>
   );
 };
 
 const RightNav = ({ dispatch, totalReview }) => {
   const Click = useCallback(() => {
-    dispatch({ type: 'SHOW_FORM' })
+    dispatch({ type: "SHOW_FORM" });
   }, []);
   return (
     <div className={cx("right-nav")}>
-      <div className={cx("review-title")}>
-        <span>Review&nbsp;</span>
-        (<span>{totalReview}</span>)
+      <div className={cx("review-nav-title")}>
+        <span>Review&nbsp;</span>(<span>{totalReview}</span>)
       </div>
-      <div className={cx("write-btn")} onClick={Click}>리뷰 작성</div>
+      <div className={cx("write-btn")} onClick={Click}>
+        리뷰 작성
+      </div>
+    </div>
+  );
+};
+
+const Empty = () => {
+  return (
+    <div className={cx("empty")}>
+      <div className={cx("empty-text")}>리뷰를 작성해주세요.</div>
+    </div>
+  );
+};
+
+const Container = ({ reviews, user }) => {
+  return (
+    <div>
+      {reviews.map((review) => (
+        <Review key={review.id} review={review} user={user} />
+      ))}
+    </div>
+  );
+};
+
+const Review = ({ review, user }) => {
+  return (
+    <div className={cx("review")}>
+      <div className={cx("review-title")}>{review.title}</div>
+      <div className={cx("review-info")}>
+        <div className={cx("review-stars")}>
+          {review.stars.map((star, index) => (
+            <div key={index} className={cx("review-stars", star)}></div>
+          ))}
+        </div>
+        <div className={cx("line")}></div>
+        <div className={cx("review-type")}>{review.type}</div>
+        <div className={cx("line")}></div>
+        <Link
+          to={`/members?member=${review.MemberId}`}
+          className={cx("review-nick", "review-common")}
+        >
+          {review.nick}
+        </Link>
+        <div className={cx("line")}></div>
+        <div className={cx("review-common")}>{review.createdAt}</div>
+        <div className={cx("line")}></div>
+        <div className={cx("review-common")}>{review.updatedAt}</div>
+        {user && user.id == review.MemberId && (
+          <div className={cx("review-user")}>
+            <div className={cx("line")}></div>
+            <div className={cx("review-edit", "review-common")}>수정</div>
+            <div className={cx("line")}></div>
+            <div className={cx("review-delete", "review-common")}>삭제</div>
+          </div>
+        )}
+      </div>
+      {!review.text.slice ? (
+        <>
+          <div className={cx("review-text")}>{review.text.original}</div>
+          <div className={cx("review-text")} hidden></div>
+        </>
+      ) : (
+        <>
+          <div className={cx("review-text")}>{review.text.slice}...</div>
+          <div className={cx("review-text")} hidden>
+            {review.text.original}
+          </div>
+        </>
+      )}
+      <div className={cx("review-btn")}>
+        {review.overText && (
+          <div className={cx("more")}>
+            <div className={cx("more-text")}>더보기</div>
+            <img
+              className={cx("more-arrow")}
+              src="/img/icon/down-arrow.png"
+              alt="arrow"
+            />
+          </div>
+        )}
+        <div></div>
+        <div className={cx("heart")}>
+          <div className={cx("heart-img-box")}>
+            <img
+              className={cx("heart-img")}
+              src="/img/icon/heart.png"
+              alt="heart"
+            />
+            <img
+              className={cx("heart-img")}
+              src="/img/icon/heart.png"
+              alt="heart"
+            />
+          </div>
+          <div className={cx("heart-total")}>{review.like}</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Pagenation = () => {
+  return (
+    <div className={cx("pagenation")}>
+      <div className={cx("page-btn")}>
+        &lt;&lt;
+      </div>
+      <div className={cx("page-btn")}>
+        &lt;
+      </div>
+      <div className={cx("page-numbers")}>
+        <div className={cx("page-number")}></div>
+        <div className={cx("page-number")}></div>
+        <div className={cx("page-number")}></div>
+        <div className={cx("page-number")}></div>
+        <div className={cx("page-number")}></div>
+      </div>
+      <div className={cx("page-btn")}>
+        &gt;
+      </div>
+      <div className={cx("page-btn")}>
+        &gt;&gt;
+      </div>
     </div>
   );
 };
 
 const Form = ({ book, dispatch }) => {
   const Cancel = useCallback(() => {
-    dispatch({ type: 'CANCEL_FORM' })
+    dispatch({ type: "CANCEL_FORM" });
   }, []);
   const { book: thatBook } = book;
   return (
@@ -170,19 +295,19 @@ const Form = ({ book, dispatch }) => {
   );
 };
 
-const Book = ({ loading, book }) => {
+const Book = ({ loading, data }) => {
   const [state, dispatch] = useReducer(componentReducer, componentState);
   const { form } = state;
   return (
     <>
       {loading && <div className={cx("loading")}>로딩중...</div>}
-      {!loading && book && (
+      {!loading && data && (
         <>
           <div className={cx("book")}>
-            <Left book={book} />
-            <Right book={book} dispatch={dispatch}/>
+            <Left data={data} />
+            <Right data={data} dispatch={dispatch} />
           </div>
-          {form && <Form book={book} dispatch={dispatch}/>}
+          {form && <Form data={data} dispatch={dispatch} />}
         </>
       )}
     </>

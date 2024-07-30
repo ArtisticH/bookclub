@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import Book from "../../Components/Book/Book";
 import { getBook } from "../../Modules/Book/Book";
 
-const BookContainer = ({ loading, book, getBook }) => {
+const BookContainer = ({ loading, data, getBook }) => {
   const params = useParams();
   const id = params.id;
 
@@ -14,7 +14,7 @@ const BookContainer = ({ loading, book, getBook }) => {
 
   return (
     <Book
-    book={book}
+    data={data}
     loading={loading}
     />
   );
@@ -23,7 +23,7 @@ const BookContainer = ({ loading, book, getBook }) => {
 export default connect(
   ({ book }) => ({
     loading: book.loading,
-    book: book.book,
+    data: book.data,
   }),
   {
     getBook,

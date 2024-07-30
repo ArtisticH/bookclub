@@ -155,7 +155,7 @@
   justify-content: space-between;
 }
 
-.review-title {
+.review-nav-title {
   font-family: var(--font-montserrat);
   font-size: 1.8rem;
   font-weight: 500;
@@ -175,6 +175,223 @@
   font-size: 1rem;
   letter-spacing: -1px;
   border-radius: 4px;
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 200px 0;
+}
+
+.empty-text {
+  font-family: var(--font-korean);
+  font-size: 1.3rem;
+  letter-spacing: -1.3px;
+  font-weight: 200;
+}
+
+.review {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(128, 128, 128, 0.4);
+}
+
+.review-title {
+  font-family: var(--font-korean);
+  font-size: 1.1rem;
+  letter-spacing: -1px;
+  font-weight: 500;
+}
+
+.review-info {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 10px 0;
+  height: 15px;
+}
+
+.review-stars {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.review-star {
+  width: 15px;
+  height: 15px;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.review-star.full {
+  background-color: #0c3aa5;
+}
+
+.review-star.empty {
+  background-color: grey;
+  opacity: 0.5;
+}
+
+.line {
+  width: 1px;
+  background-color: grey;
+  margin: 0 5px;
+  height: 100%;
+}
+
+.review-type {
+  font-family: var(--font-poppins);
+  color: #0c3aa5;
+  font-size: 0.8rem;
+  letter-spacing: -1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.review-common {
+  font-family: var(--font-korean);
+  font-size: 0.8rem;
+  letter-spacing: -1px;
+  color: grey;
+  height: 100%;
+}
+
+.review-nick,
+.review-edit,
+.review-delete {
+  cursor: pointer;
+}
+
+.review-user {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 15px;
+  box-sizing: border-box;
+}
+
+.review-text {
+  width: 100%;
+  font-family: var(--font-korean);
+  font-size: 0.9rem;
+  letter-spacing: -0.5px;
+  line-height: 1.4;
+}
+
+.review-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+
+.more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.more-text {
+  font-family: var(--font-korean);
+  font-size: 0.8rem;
+  letter-spacing: -0.8px;
+  color: grey;
+  margin-right: 5px;
+}
+
+.more-arrow {
+  display: block;
+  width: 15px;
+}
+
+.heart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  height: 15px;
+}
+
+.heart-img-box {
+  position: relative;
+  width: 15px;
+  height: 100%;
+}
+
+.heart-img {
+  height: 100%;
+  width: 100%;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.heart-img.back {
+  transition: all 1s ease-out;
+  transform: translateY(-200%);
+  opacity: 0;
+}
+
+.heart-total {
+  height: 100%;
+  margin: 0px 2px;
+  font-family: var(--font-montserrat);
+  font-weight: 500;
+  color: #0c3aa5;
+  font-size: 0.8rem;
+  letter-spacing: -0.8px;
+  width: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagenation {
+  padding-top: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid rgba(128, 128, 128, 0.4);
+}
+
+.page-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 25px;
+  height: 25px;
+  font-size: 1.5rem;
+  letter-spacing: -3px;
+  font-family: var(--font-montserrat);
+}
+
+.page-numbers {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 10px;
+}
+
+.page-number {
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: var(--font-montserrat);
+  font-size: 1.2rem;
+}
+
+.page-number.clicked {
+  color: #0c3aa5;
+  font-weight: 600;
 }
 
 .form {
@@ -365,10 +582,10 @@
     margin-bottom: 30px;
   }
 
-  /* .review-empty {
+  .empty {
     height: calc(100% - 35px);
     padding: 0;
-  }   */
+  }  
 }
 
 @media all and (min-width: 800px) {

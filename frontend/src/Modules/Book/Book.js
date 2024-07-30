@@ -10,10 +10,10 @@ const getBook = (id) => async (dispatch) => {
   dispatch({ type: GET_BOOK });
   try {
     const res = await axios.get(`/books/${id}`);
-    const book = res.data;
+    const data = res.data;
     dispatch({
       type: GET_BOOK_SUCCESS,
-      payload: book, // 객체
+      payload: data, // 객체
     });
 
   } catch (e) {
@@ -26,7 +26,7 @@ const getBook = (id) => async (dispatch) => {
 
 const containerState = {
   loading: false,
-  book: null,
+  data: null,
 };
 
 const book = handleActions( // 루트 리듀서
@@ -37,7 +37,7 @@ const book = handleActions( // 루트 리듀서
     }),
     [GET_BOOK_SUCCESS]: (state, action) => ({
       loading: false,
-      book: action.payload, // 객체
+      data: action.payload, // 객체
     }),
     [GET_BOOK_FAILURE]: (state) => ({
       ...state,

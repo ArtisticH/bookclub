@@ -74,6 +74,7 @@ router.get('/:id', async (req, res) => {
       starArr, // 이 책에 대한 총 평점 배열
       reviews, // 리뷰5개
       totalReview, // 총 리뷰갯수
+      user: res.user,
     });  
   } catch(err) {
     console.error(err);
