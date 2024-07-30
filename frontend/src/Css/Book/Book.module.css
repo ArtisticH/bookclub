@@ -177,7 +177,7 @@
   border-radius: 4px;
 }
 
-.empty {
+.empty-area {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -202,6 +202,7 @@
   font-size: 1.1rem;
   letter-spacing: -1px;
   font-weight: 500;
+  line-height: 1;
 }
 
 .review-info {
@@ -242,6 +243,7 @@
 }
 
 .review-type {
+  line-height: 1;
   font-family: var(--font-poppins);
   color: #0c3aa5;
   font-size: 0.8rem;
@@ -257,11 +259,13 @@
   letter-spacing: -1px;
   color: grey;
   height: 100%;
+  line-height: 1;
 }
 
 .review-nick,
 .review-edit,
 .review-delete {
+  line-height: 1;
   cursor: pointer;
 }
 
@@ -352,46 +356,61 @@
 }
 
 .pagenation {
-  padding-top: 30px;
+  height: 25px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-top: 1px solid rgba(128, 128, 128, 0.4);
+  margin: 20px 0;
 }
 
 .page-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  width: 25px;
+  width: 30px;
   height: 25px;
+  font-family: var(--font-montserrat);
   font-size: 1.5rem;
+  font-weight: 300;
   letter-spacing: -3px;
-  font-family: var(--font-montserrat);
-}
-
-.page-numbers {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 10px;
-}
-
-.page-number {
-  width: 25px;
-  height: 25px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   cursor: pointer;
-  font-family: var(--font-montserrat);
-  font-size: 1.2rem;
 }
 
-.page-number.clicked {
-  color: #0c3aa5;
-  font-weight: 600;
+.page-input,
+.page-last {
+  display: flex;
+  height: 25px;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-montserrat);
+  font-size: 1rem;
+  letter-spacing: -2px;
+  line-height: 0.7;
+  cursor: pointer;
+}
+
+.page-input {
+  padding-left: 5px;
+  width: 25px;
+}
+
+.page-last {
+  width: 35px;
+}
+
+.page-move {
+  cursor: pointer;
+  display: flex;
+  width: 40px;
+  height: 25px;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-korean);
+  font-size: 1rem;
+  letter-spacing: -1px;
+  background-color: grey;
+  color: white;
+  line-height: 1;
 }
 
 .form {

@@ -14,7 +14,7 @@ const Left = ({ length }) => {
       </div>
       <Link to="/" className={cx("arrow")}>
         <img
-          className={cx("img")}
+          className="img"
           src="/img/icon/left-white-arrow.png"
           alt="arrow"
         />
@@ -50,7 +50,7 @@ const Books = ({ books, loading }) => {
   }, []);
   return (
     <>
-      {loading && <div className={cx("loading")}>로딩중...</div>}
+      {loading && <div className="loading">로딩중...</div>}
       {!loading && books && (
         <div className={cx("books")}>
           <Left length={books.length} />

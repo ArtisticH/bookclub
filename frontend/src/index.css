@@ -70,7 +70,6 @@ a {
   width: 100%;
 }
 
-
 @media all and (min-width: 1200px) { 
   :root {
     --final-width: 330px;

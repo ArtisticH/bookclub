@@ -270,7 +270,7 @@ const TopRight = ({ state, dispatch }) => {
         {index === 2 ? (
           <div className={cx("arrow")} onClick={ClickWishlist}>
             <img
-              className={cx("img")}
+              className="img"
               src="/img/icon/right-black-arrow.png"
               alt="arrow"
             />
@@ -278,7 +278,7 @@ const TopRight = ({ state, dispatch }) => {
         ) : (
           <Link to={`/${title[index].toLowerCase()}`} className={cx("arrow")}>
             <img
-              className={cx("img")}
+              className="img"
               src="/img/icon/right-black-arrow.png"
               alt="arrow"
             />
@@ -443,7 +443,7 @@ const Home = ({ user, loading, login, members, LogIn, LogOut }) => {
     // 로딩중이면 로딩중이라고 표시
     // 로딩이 끝나면 화면 표시
     <>
-      {loading && <div className={cx("loading")}>로딩중...</div>}
+      {loading && <div className="loading">로딩중...</div>}
       {!loading && (
         <>
           <div className={cx("home")}>

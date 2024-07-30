@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const db = require('../../models');
 const { Book, Member, Review } = require('../../models/models');
 const { makeDate, makeStar, makeSum, makeText } = require('../tools/tools');
 
@@ -80,6 +81,121 @@ router.get('/:id', async (req, res) => {
     console.error(err);
   }
 });
+
+// 리뷰 새로 등록하고 전체 평점 업데이트하고 바로 등록한 리뷰 1개와 전체 평점 숫자와 배열 보내기
+router.post('/', async (req, res) => {
+  try {
+    const BookId = req.body.BookId;
+    const MemberId = req.body.MemberId;
+    // 리뷰 등록
+    await Review.create({
+      title: req.body.title,
+      text: req.body.text,
+      overText: req.body.overText,
+      stars: req.body.stars,
+      BookId,
+      MemberId,
+    });
+    // 등록 후 이 책에 관련된 모든 평점 업데이트
+    const stars = await Review.findAll({
+      include: [{
+        model: Book,
+        where: { id: BookId },
+      }],
+      attributes: ['stars'],
+    });
+    // 평점과 배열
+    const sum = makeSum(stars);
+    const { starArr, starNum } = makeStar(sum);
+    // 그리고 최신 5개
+    const results = await Review.findAll({
+      include: [{
+        model: Book,
+        where: { id: BookId },
+      }, {
+        model: Member,
+        attributes: ['id', 'type', 'nick'],
+      }],
+      order: [['id', 'DESC']], 
+      limit: 5,
+    });
+    const reviews = results.map(review => {
+      return {
+        id: review.id,
+        title: review.title,
+        text: makeText(review.overText, review.text),
+        like: review.like,
+        overText: review.overText,
+        stars: makeStar(review.stars).starArr,
+        createdAt: makeDate(review.createdAt),
+        updatedAt: makeDate(review.updatedAt),
+        MemberId: review.Member.id,
+        type: review.Member.type,
+        nick: review.Member.nick,
+      }
+    });
+    res.json({
+      reviews,
+      starArr,
+      starNum,
+    });  
+  } catch(err) {
+    console.error(err);
+  }
+});
+
+// 좋아요
+router.post('/like', async (req, res) => {
+  try {
+    const ReviewId = req.body.ReviewId;
+    const MemberId = req.body.MemberId
+    // 먼저 해당 리뷰 글에 유저가 하트를 클릭한 적 있는지 검사
+    let result = await db.sequelize.models.ReviewLike.findOne({
+      where: {
+        ReviewId,
+        MemberId,  
+      }
+    });
+    // 클릭한적있다면(결과가있다면) clickable = false이고 클릭한적없다면 clickable = true
+    const clickable = result ? false : true;
+    if(clickable) {
+      // 클릭 반영해줄게. 
+      // ReviewLike에 관계 추가
+      await db.sequelize.models.ReviewLike.create({
+        ReviewId,
+        MemberId,
+      });
+      // like값 1 증가
+      await Review.increment('like', {
+        by: 1,
+        where: { id: ReviewId }
+      });
+    } else {
+      // 클릭 다시 취소해줄게
+      await db.sequelize.models.ReviewLike.destroy({
+        where: {
+          ReviewId,
+          MemberId, 
+        },
+      });  
+      await Review.decrement('like', {
+        by: 1,
+        where: { id: ReviewId },
+      });
+    }  
+    // 업데이트된 라이크 
+    result = await Review.findOne({
+      where: { id: ReviewId },
+      attributes: ['like'],
+    });
+    const like = result.like;
+    res.json({ clickable, like });  
+  } catch(err) {
+    console.err(err);
+  }
+});
+
+
 
 module.exports = router;
 

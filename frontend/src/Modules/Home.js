@@ -4,7 +4,6 @@ import { produce } from "immer";
 
 const GET_HOME = "Home/GET_HOME";
 const LOGIN = "Home/LOGIN";
-const MEMBERS = "Home/MEMBERS"
 const NOT_LOGIN = "Home/NOT_LOGIN";
 const GET_HOME_FAILURE = "Home/GET_HOME_FAILURE";
 
