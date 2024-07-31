@@ -171,7 +171,11 @@ const Empty = () => {
   );
 };
 
-const Folder = ({ folder, dispatch }) => {
+const Folder = ({ state, data, folder, dispatch }) => {
+  const { user, id } = data;
+  const { currentFolder } = state;
+  const navigate = useNavigate();
+
   const Click = useCallback(
     (e) => {
       dispatch({
@@ -182,8 +186,24 @@ const Folder = ({ folder, dispatch }) => {
     },
     [folder]
   );
+
+  const Open = useCallback(async () => {
+    if (!currentFolder.public && user.id != id) {
+      // 비공개폴더인데 본인이 아닐때
+      alert("비공개 폴더입니다.");
+      return;
+    }
+    const url = `/list/${currentFolder.id}/${user.id}`;
+    navigate(url);
+  }, [currentFolder, user, id]);
+
   return (
-    <div className={cx("folder")} onContextMenu={Click} data-type="folder">
+    <div
+      className={cx("folder")}
+      onContextMenu={Click}
+      data-type="folder"
+      onDoubleClick={Open}
+    >
       <div className={cx("img-box")}>
         <img className="img" src="/img/icon/folder.png" alt="folder" />
         <div className={cx("count", { private: !folder.public })}>
@@ -195,18 +215,34 @@ const Folder = ({ folder, dispatch }) => {
   );
 };
 
-const Done = ({ done, dispatch }) => {
-  const Click = useCallback(
-    (e) => {
-      dispatch({
-        type: "MENU_DONE_OPEN",
-        position: { x: e.clientX, y: e.clientY },
-      });
-    },
-    []
-  );
+const Done = ({ state, data, done, dispatch }) => {
+  const { currentFolder } = state;
+  const { user, id } = data;
+  const navigate = useNavigate();
+  const Click = useCallback((e) => {
+    dispatch({
+      type: "MENU_DONE_OPEN",
+      position: { x: e.clientX, y: e.clientY },
+    });
+  }, []);
+
+  const Open = useCallback(async () => {
+    if (!currentFolder.public && user.id != id) {
+      // 비공개폴더인데 본인이 아닐때
+      alert("비공개 폴더입니다.");
+      return;
+    }
+    const url = `/donelist/${user.id}`;
+    navigate(url);
+  }, [user, currentFolder, id]);
+
   return (
-    <div className={cx("folder")} onContextMenu={Click} data-type="folder">
+    <div
+      className={cx("folder")}
+      onContextMenu={Click}
+      data-type="folder"
+      onDoubleClick={Open}
+    >
       <div className={cx("img-box")}>
         <img className="img" src="/img/icon/folder.png" alt="folder" />
         <div className={cx("count", { private: !done.public })}>
@@ -231,9 +267,14 @@ const FolderMenu = ({ data, state, dispatch, ContainerDispatch }) => {
   }, [position]);
 
   const Open = useCallback(async () => {
+    if (!currentFolder.public && user.id != id) {
+      // 비공개폴더인데 본인이 아닐때
+      alert("비공개 폴더입니다.");
+      return;
+    }
     const url = `/list/${currentFolder.id}/${user.id}`;
     navigate(url);
-  }, [currentFolder, user])
+  }, [currentFolder, user, id]);
 
   const Change = useCallback(() => {
     if (!user || user.id != id) {
@@ -294,7 +335,9 @@ const FolderMenu = ({ data, state, dispatch, ContainerDispatch }) => {
   }, [currentFolder]);
   return (
     <div className={cx("folder-menu")} style={style}>
-      <div className={cx("menu")} onClick={Open}>열기</div>
+      <div className={cx("menu")} onClick={Open}>
+        열기
+      </div>
       <div className={cx("menu")} onClick={Change}>
         이름 변경
       </div>
@@ -310,7 +353,7 @@ const FolderMenu = ({ data, state, dispatch, ContainerDispatch }) => {
 
 const DoneFolderMenu = ({ data, state, dispatch, ContainerDispatch }) => {
   const { id, user, done } = data;
-  const { position } = state;
+  const { position, currentFolder } = state;
   const { changeDonePublic } = ContainerDispatch;
   const navigate = useNavigate();
   const style = useMemo(() => {
@@ -321,9 +364,14 @@ const DoneFolderMenu = ({ data, state, dispatch, ContainerDispatch }) => {
   }, [position]);
 
   const Open = useCallback(async () => {
+    if (!currentFolder.public && user.id != id) {
+      // 비공개폴더인데 본인이 아닐때
+      alert("비공개 폴더입니다.");
+      return;
+    }
     const url = `/donelist/${user.id}`;
     navigate(url);
-  }, [user])
+  }, [user, currentFolder, id]);
 
   const Public = useCallback(async () => {
     if (!user || user.id != id) {
@@ -354,7 +402,9 @@ const DoneFolderMenu = ({ data, state, dispatch, ContainerDispatch }) => {
   }, [done]);
   return (
     <div className={cx("folder-menu")} style={style}>
-      <div className={cx("menu")} onClick={Open}>열기</div>
+      <div className={cx("menu")} onClick={Open}>
+        열기
+      </div>
       <div className={cx("menu")} onClick={Public}>
         공개&nbsp;/&nbsp;비공개로 전환
       </div>
@@ -501,10 +551,17 @@ const Wishlist = ({ data, loading, ContainerDispatch }) => {
                     <Folder
                       key={folder.id}
                       folder={folder}
+                      state={state}
+                      data={data}
                       dispatch={dispatch}
                     />
                   ))}
-                  <Done done={done} dispatch={dispatch} />
+                  <Done
+                    done={done}
+                    state={state}
+                    data={data}
+                    dispatch={dispatch}
+                  />
                 </>
               )}
             </div>

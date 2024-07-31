@@ -2,7 +2,6 @@ const express = require('express');
 const { Folder, List, DoneFolder, DoneList, Member } = require('../../models/models');
 const { Op } = require('sequelize');
 const { upload, none } = require('../tools/multer');
-const { listOffset } = require('../tools/tools');
 
 const router = express.Router();
 
@@ -11,7 +10,7 @@ router.use((req, res, next) => {
   next();
 });
 // 처음에 내려보낼때 그냥 폴더인지 아니면 읽은 것들인지
-router.get('//:folderid/:memberid', async (req, res) => {
+router.get('/:folderid/:memberid', async (req, res) => {
   try {
     const MemberId = req.params.memberid;
     const FolderId = req.params.folderid;
@@ -71,17 +70,14 @@ router.get('//:folderid/:memberid', async (req, res) => {
       title,
       others,
       count,
+      FolderId, 
       user: res.user,
-      // img: 'list',
     });  
   } catch(err) {
     console.error(err);
   }
 });
-
-// 이미지 파일 올리면
-// 그걸 미리보기로 바로 보여줘야 한다. 
-// 그래서 upload파일에 올려야 한다.
+// 이미지 미리보기
 router.post('/preview', upload.single('image'), (req, res) => {
   try {
     const url = `/img/${req.file.filename}`;
@@ -99,7 +95,7 @@ router.post('/', none.none(), async(req, res) => {
     const MemberId = req.body.MemberId;
     const FolderId = req.body.FolderId;
     // 리스트 새롭게 저장
-    const list = await List.create({
+    await List.create({
       img,
       title,
       author,
@@ -115,20 +111,37 @@ router.post('/', none.none(), async(req, res) => {
       by: 1,
       where: { id: FolderId },
     });
-    res.json({ list });  
+    results = await List.findAll({
+      include: [{
+        model: Member,
+        where: { id: MemberId },
+      }, {
+        model: Folder,
+        where: { id: FolderId },
+      }],
+      limit: 15,
+      attributes: ['id', 'title', 'author', 'img'],
+    });
+    const lists = results.map(item => {
+      return {
+        id: item.id,
+        title: item.title,
+        author: item.author,
+        img: item.img,
+      }
+    });
+    res.json({ lists });  
   } catch(err) {
     console.error(err);
   }
 });
 // 리스트 삭제할때
-router.delete('/', async(req, res) => {
+router.post('/delete', async(req, res) => {
   try {
     const FolderId = req.body.FolderId;
     const MemberId = req.body.MemberId;
-    const page = req.body.page; // 어느 페이지에서 삭제했는지
-    const count = +req.body.count; // 카운트: 몇 개 내려보내야 하는지(= 몇 개 삭제했는지)
-    const last = req.body.last;
-    // 삭제할 친구들 아이디
+    const page = req.body.page; 
+    const offset = 5 * (page - 1);
     const ids = JSON.parse(req.body.id);
     // 삭제하고
     await List.destroy({
@@ -143,10 +156,6 @@ router.delete('/', async(req, res) => {
       by: ids.length,
       where: { id: FolderId },
     });
-    // 그냥 삭제만 필요한 경우 아무것도 안 보낸다.
-    if(count === 0) {
-      return res.json({});
-    }
     const results = await List.findAll({
       include: [{
         model: Member,
@@ -155,13 +164,11 @@ router.delete('/', async(req, res) => {
         model: Folder,
         where: { id: FolderId },
       }],
-      // 몇 개 내려보내야 하는지
-      limit: count,
-      // 앞에서부터 몇번째의 리스트를 가져와야 하는지
-      offset: listOffset(page, count, last),
+      limit: 15,
+      offset,
       attributes: ['id', 'title', 'author', 'img'],
     });
-    const lists = results.map(item => {
+    const newLists = results.map(item => {
       return {
         id: item.id,
         img: item.img,
@@ -169,7 +176,7 @@ router.delete('/', async(req, res) => {
         author: item.author,
       }
     });
-    res.json({ lists });  
+    res.json({ newLists });  
   } catch(err) {
     console.error(err);
   }
@@ -342,38 +349,24 @@ router.post('/read', async (req, res) => {
   }
 });
 // 페이지네이션
-router.post('/page', async (req, res) => {
+router.get('/page/:folderid/:memberid/:page', async (req, res) => {
   try {
-    const page = req.body.page;
-    const done = req.body.done;
-    const MemberId = req.body.MemberId;
+    const FolderId = req.params.folderid;
+    const MemberId = req.params.memberid;
+    const page = req.params.page;
     const offset = (page - 1) * 15;
-    let items;
-    if(done) {
-      items = await DoneList.findAll({
-        include: [{
-          model: Member,
-          where: { id: MemberId },
-        }],
-        limit: 15,
-        offset,
-        attributes: ['id', 'title', 'author', 'img'],
-      });
-    } else {
-      const FolderId = req.body.FolderId;
-      items = await List.findAll({
-        include: [{
-          model: Member,
-          where: { id: MemberId },
-        }, {
-          model: Folder,
-          where: { id: FolderId },
-        }],
-        limit: 15,
-        offset,
-        attributes: ['id', 'title', 'author', 'img'],
-      });
-    }
+    const items = await List.findAll({
+      include: [{
+        model: Member,
+        where: { id: MemberId },
+      }, {
+        model: Folder,
+        where: { id: FolderId },
+      }],
+      limit: 15,
+      offset,
+      attributes: ['id', 'title', 'author', 'img'],
+    });
     const lists = items.map(item => {
       return {
         id: item.id,
@@ -487,52 +480,52 @@ router.post('/back', async (req, res) => {
   }
 });
 // 읽은 것들에서 삭제
-router.delete('/done', async (req, res) => {
-  try {
-    const ids = JSON.parse(req.body.id);
-    const MemberId = req.body.MemberId;
-    const count = req.body.count;
-    const page = req.body.page;
-    const last = req.body.last;
-    // doneFolder의 count는 줄이고.
-    await DoneFolder.decrement('count', {
-      by: ids.length,
-      where: { id: MemberId },
-    })
-    // DoneList에서 삭제하고
-    await DoneList.destroy({
-      include: [{
-        model: Member,
-        where: { id: MemberId },
-      }],
-      where: { id: ids },
-    });
-    if(count === 0) {
-      return res.json({});
-    }
-    items = await DoneList.findAll({
-      include: [{
-        model: Member,
-        where: { id: MemberId },
-      },],
-      // 몇 개 내려보내야 하는지
-      limit: count,
-      // 앞에서부터 몇번째의 리스트를 가져와야 하는지
-      offset: listOffset(page, count, last),
-      attributes: ['id', 'title', 'author', 'img'],
-    });
-    const lists = items.map(item => {
-      return {
-        id: item.id,
-        img: item.img,
-        title: item.title,
-        author: item.author,
-      }
-    });
-    res.json({ lists });  
-  } catch(err) {
-    console.error(err);
-  }
-});
+// router.delete('/done', async (req, res) => {
+//   try {
+//     const ids = JSON.parse(req.body.id);
+//     const MemberId = req.body.MemberId;
+//     const count = req.body.count;
+//     const page = req.body.page;
+//     const last = req.body.last;
+//     // doneFolder의 count는 줄이고.
+//     await DoneFolder.decrement('count', {
+//       by: ids.length,
+//       where: { id: MemberId },
+//     })
+//     // DoneList에서 삭제하고
+//     await DoneList.destroy({
+//       include: [{
+//         model: Member,
+//         where: { id: MemberId },
+//       }],
+//       where: { id: ids },
+//     });
+//     if(count === 0) {
+//       return res.json({});
+//     }
+//     items = await DoneList.findAll({
+//       include: [{
+//         model: Member,
+//         where: { id: MemberId },
+//       },],
+//       // 몇 개 내려보내야 하는지
+//       limit: count,
+//       // 앞에서부터 몇번째의 리스트를 가져와야 하는지
+//       offset: listOffset(page, count, last),
+//       attributes: ['id', 'title', 'author', 'img'],
+//     });
+//     const lists = items.map(item => {
+//       return {
+//         id: item.id,
+//         img: item.img,
+//         title: item.title,
+//         author: item.author,
+//       }
+//     });
+//     res.json({ lists });  
+//   } catch(err) {
+//     console.error(err);
+//   }
+// });
 
 module.exports = router;

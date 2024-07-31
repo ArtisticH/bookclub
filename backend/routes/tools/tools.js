@@ -97,24 +97,10 @@ function makeTypeTitle(item, oneBlog) {
   return { type, title }
 }
 
-function listOffset(page, count, last) {
-  let offset;
-  if(count === 15 && !!last === true) {
-    // 앞의 15개를 보내야 한다.
-    offset = (page - 2) * 15;
-  } else {
-    // 뒤에서 땅겨오기
-    // count === 15 && !!last === false도 여기 해당
-    offset = (page - 1) * 15 + (15 - count);
-  }
-  return offset;
-}
-
 module.exports = {
   makeDate, 
   makeText, 
   makeSum,
   makeStar,
   makeTypeTitle,
-  listOffset,
 }
