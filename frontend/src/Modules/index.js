@@ -3,6 +3,7 @@ import home from './Home'
 import books from './Book/Books'
 import book from './Book/Book'
 import members from './Members'
+import wishlist from './Wishlist/Wishlist'
 import favorite from './Favorite/Favorite';
 import tournament from './Favorite/Tournament';
 import ranking from './Favorite/Ranking';
@@ -12,6 +13,7 @@ const rootReducer = combineReducers({
   books,
   book,
   members,
+  wishlist,
   favorite,
   tournament,
   ranking,

@@ -2,7 +2,7 @@ import { handleActions } from "redux-actions";
 import axios from "axios";
 import { produce } from "immer";
 
-const GET_MEMBER = "Home/GET_MEMBER";
+const GET_MEMBER = "MEMBER/GET_MEMBER";
 const GET_MEMBER_SUCCESS = "MEMBER/GET_MEMBER_SUCCESS";
 const GET_MEMBER_FAILURE = "MEMBER/GET_MEMBER_FAILURE";
 

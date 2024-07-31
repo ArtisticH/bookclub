@@ -80,12 +80,12 @@ const Btns = ({ state }) => {
       <Link to="/quotes" className={cx("btn", "quotes")}>
         Quotes
       </Link>
-      <Link
+      <div
         className={cx("btn", "wishlist", { clicked: show })}
         onClick={show ? Wishlist : null}
       >
         WISHLIST
-      </Link>
+      </div>
       <Link to="/favorite" className={cx("btn", "favorite")}>
         Favorite
       </Link>
