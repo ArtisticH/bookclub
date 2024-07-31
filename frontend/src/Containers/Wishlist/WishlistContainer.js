@@ -6,7 +6,10 @@ import {
   getWishlist,
   addFolder,
   changeName,
-  deleteFolder
+  deleteFolder,
+  changePublic,
+  newFolders,
+  changeDonePublic
 } from "../../Modules/Wishlist/Wishlist";
 
 const WishlistContainer = ({
@@ -15,7 +18,10 @@ const WishlistContainer = ({
   getWishlist,
   addFolder,
   changeName,
-  deleteFolder
+  deleteFolder,
+  changePublic,
+  newFolders,
+  changeDonePublic
 }) => {
 
   const params = useParams();
@@ -24,7 +30,10 @@ const WishlistContainer = ({
   const ContainerDispatch = {
     addFolder,
     changeName,
-    deleteFolder
+    deleteFolder,
+    changePublic,
+    newFolders,
+    changeDonePublic
   }
 
   useEffect(() => {
@@ -45,6 +54,9 @@ export default connect(
     getWishlist,
     addFolder,
     changeName,
-    deleteFolder
+    deleteFolder,
+    changePublic,
+    newFolders,
+    changeDonePublic
   }
 )(WishlistContainer);

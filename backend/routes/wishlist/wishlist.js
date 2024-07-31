@@ -44,7 +44,6 @@ router.get('/:id', async (req, res) => {
         title: result.title,
         count: result.count,
         public: result.public,
-        createdAt: result.createdAt,
       }
     });
     const done = await DoneFolder.findOne({
@@ -79,7 +78,6 @@ router.post('/folder', async (req, res) => {
       title: result.title,
       count: result.count,
       public: result.public,
-      createdAt: result.createdAt,
     };
     res.json({
       folder,
@@ -168,7 +166,6 @@ router.post('/sort', async (req, res) => {
     const sort = req.body.sort;
     const MemberId = req.body.MemberId;
     const order = req.body.order;
-    const updated = req.body.updated;
     const result = await Sort.findOne({
       where: { MemberId },
     });
@@ -188,28 +185,22 @@ router.post('/sort', async (req, res) => {
         where: { MemberId },
       });  
     }
-    // 분류 기준이 수정일이라면 새로 데이터베이스에서 내려줘야 한다.
-    if(updated) {
-      const items = await Folder.findAll({
-        include: [{
-          model: Member,
-          where: { id: MemberId },
-        }],
-        order: [[sort, order]],
-      }); 
-      const folders = items.map(item => {
-        return {
-          id: item.id,
-          title: item.title,
-          count: item.count,
-          public: item.public,
-          createdAt: item.createdAt,
-        }
-      });
-      res.json({ folders });  
-    } else {
-      res.json({}); 
-    }   
+    const items = await Folder.findAll({
+      include: [{
+        model: Member,
+        where: { id: MemberId },
+      }],
+      order: [[sort, order]],
+    }); 
+    const folders = items.map(item => {
+      return {
+        id: item.id,
+        title: item.title,
+        count: item.count,
+        public: item.public,
+      }
+    });
+    res.json({ folders });  
   } catch(err) {
     console.error(err);
   }

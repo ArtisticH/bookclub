@@ -8,6 +8,9 @@ const GET_WISH_FAILURE = "WISH/GET_WISH_FAILURE";
 const ADD_FOLDER = "WISH/ADD_FOLDER";
 const CHANGE_NAME = "WISH/CHANGE_NAME";
 const DELETE_FOLDER = "WISH/DELETE_FOLDER";
+const CHANGE_PUBLIC = "WISH/CHANGE_PUBLIC";
+const CHANGE_DONE_PUBLIC = "WISH/CHANGE_DONE_PUBLIC";
+const NEW_FOLDERS = "WISH/NEW_FOLDERS";
 
 const getWishlist = (id) => async (dispatch) => {
   dispatch({ type: GET_WISH });
@@ -65,6 +68,22 @@ const wishlist = handleActions(
         draft.data.folders.splice(index, 1);
         draft.total--;
       }),
+    [CHANGE_PUBLIC]: (state, action) =>
+      produce(state, (draft) => {
+        const index = draft.data.folders.findIndex(
+          (folder) => folder.id === action.payload.id
+        );
+        draft.data.folders[index].public = action.payload.boolean;
+      }),
+    [CHANGE_DONE_PUBLIC]: (state, action) =>
+      produce(state, (draft) => {
+        draft.data.done.public = action.payload;
+      }),
+
+    [NEW_FOLDERS]: (state, action) =>
+      produce(state, (draft) => {
+        draft.data.folders = action.payload;
+      }),
   },
   containerState
 );
@@ -78,11 +97,24 @@ const deleteFolder = (id) => ({
   type: DELETE_FOLDER,
   payload: id,
 });
+const changePublic = (id, boolean) => ({
+  type: CHANGE_PUBLIC,
+  payload: { id, boolean },
+});
+const newFolders = (newFolders) => ({
+  type: NEW_FOLDERS,
+  payload: newFolders,
+});
+const changeDonePublic = (boolean) => ({
+  type: CHANGE_DONE_PUBLIC,
+  payload: boolean,
+});
 
 const componentState = {
   menu: {
     folder: false,
     blank: false,
+    done: false,
   },
   modal: {
     add: false,
@@ -101,6 +133,7 @@ function componentReducer(state, action) {
       return produce(state, (draft) => {
         draft.menu.blank = true;
         draft.menu.folder = false;
+        draft.menu.done = false;
         draft.position.x = action.position.x;
         draft.position.y = action.position.y;
       });
@@ -108,15 +141,25 @@ function componentReducer(state, action) {
       return produce(state, (draft) => {
         draft.menu.folder = true;
         draft.menu.blank = false;
+        draft.menu.done = false;
         draft.position.x = action.position.x;
         draft.position.y = action.position.y;
         // 어떤 폴더를 클릭했는지 기록해놔
         draft.currentFolder = action.currentFolder;
       });
+    case "MENU_DONE_OPEN":
+      return produce(state, (draft) => {
+        draft.menu.folder = false;
+        draft.menu.blank = false;
+        draft.menu.done = true;
+        draft.position.x = action.position.x;
+        draft.position.y = action.position.y;
+      });
     case "NO_MENU_OPEN":
       return produce(state, (draft) => {
         draft.menu.blank = false;
         draft.menu.folder = false;
+        draft.menu.done = false;
         draft.position.x = null;
         draft.position.y = null;
       });
@@ -146,6 +189,9 @@ export {
   addFolder,
   changeName,
   deleteFolder,
+  changePublic,
+  newFolders,
+  changeDonePublic,
   componentState,
   componentReducer,
 };

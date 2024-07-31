@@ -7,120 +7,78 @@ const { listOffset } = require('../tools/tools');
 const router = express.Router();
 
 router.use((req, res, next) => {
-  res.locals.user = req.user;
+  res.user = req.user;
   next();
 });
 // 처음에 내려보낼때 그냥 폴더인지 아니면 읽은 것들인지
-router.get('/:done/:folderid/:memberid', async (req, res) => {
+router.get('//:folderid/:memberid', async (req, res) => {
   try {
-    const done = req.params.done;
     const MemberId = req.params.memberid;
-    if(done === 'true') {
-      // 카운트, 닉네임, 리스트, 페이지넘버
-      let results = await DoneFolder.findOne({
-        where: { MemberId },
-        attributes: ['count'],
-      });
-      // 카운트
-      const count = results.count;
-      // 처음에 15개 보내, 리스트
-      results = await DoneList.findAll({
-        include: [{
-          model: Member,
-          where: { id: MemberId },
-        }],
-        limit: 15,
-        attributes: ['id', 'title', 'author', 'img'],
-      });
-      const lists = results.map(item => {
-        return {
-          id: item.id,
-          title: item.title,
-          author: item.author,
-          img: item.img,
-        }
-      });
-      // 닉네임
-      const member = await Member.findOne({
+    const FolderId = req.params.folderid;
+    let results = await Folder.findOne({
+      include: [{
+        model: Member,
         where: { id: MemberId },
-        attributes: ['id', 'nick'],
-      });
-      res.render('wishlist/list', {
-        lists,
-        count,
-        member,
-        isDone: true,
-        title: '읽은 것들',
-        img: 'donelist',
-      });  
-    } else if(done === 'false') {
-      const FolderId = req.params.folderid;
-      // 카운트, 타이틀, 닉네임, 리스트, 페이지넘버, 다른 폴더들
-      // 카운트, 타이틀
-      let results = await Folder.findOne({
-        include: [{
-          model: Member,
-          where: { id: MemberId },
-          attributes: ['id', 'nick']
-        }],
+        attributes: ['id', 'nick']
+      }],
+      where: { id: FolderId },
+      attributes: ['count', 'title'],
+    });
+    const member = results.Member;
+    // 카운트
+    const count = results.count;
+    const title = results.title;
+    // 해당 유저의 다른 폴더들, 근데 현재 폴더는 제외해야 함.
+    // 폴더 이동 폼 클릭 시 보여지는 화면
+    results = await Folder.findAll({
+      include: [{
+        model: Member,
+        where: { id: MemberId },
+      }],
+      where: { id: { [Op.not]: FolderId }},
+      attributes: ['id', 'title', 'count'],
+    });
+    const others = results.map(item => {
+      return {
+        id: item.id,
+        title: item.title,
+        count: item.count,
+      }
+    });
+    // 15개만
+    results = await List.findAll({
+      include: [{
+        model: Member,
+        where: { id: MemberId },
+      }, {
+        model: Folder,
         where: { id: FolderId },
-        attributes: ['count', 'title'],
-      });
-      const member = results.Member;
-      // 카운트
-      const count = results.count;
-      const title = results.title;
-      // 해당 유저의 다른 폴더들, 근데 현재 폴더는 제외해야 함.
-      // 폴더 이동 폼 클릭 시 보여지는 화면
-      results = await Folder.findAll({
-        include: [{
-          model: Member,
-          where: { id: MemberId },
-        }],
-        where: { id: { [Op.not]: FolderId }},
-        attributes: ['id', 'title', 'count'],
-      });
-      const others = results.map(item => {
-        return {
-          id: item.id,
-          title: item.title,
-          count: item.count,
-        }
-      });
-      // 15개만
-      results = await List.findAll({
-        include: [{
-          model: Member,
-          where: { id: MemberId },
-        }, {
-          model: Folder,
-          where: { id: FolderId },
-        }],
-        limit: 15,
-        attributes: ['id', 'title', 'author', 'img'],
-      });
-      const lists = results.map(item => {
-        return {
-          id: item.id,
-          title: item.title,
-          author: item.author,
-          img: item.img,
-        }
-      });
-      res.render('wishlist/list', {
-        member,
-        lists,
-        title,
-        others,
-        count,
-        isDone: false,
-        img: 'list',
-      });  
-    }  
+      }],
+      limit: 15,
+      attributes: ['id', 'title', 'author', 'img'],
+    });
+    const lists = results.map(item => {
+      return {
+        id: item.id,
+        title: item.title,
+        author: item.author,
+        img: item.img,
+      }
+    });
+    res.json({
+      member,
+      lists,
+      title,
+      others,
+      count,
+      user: res.user,
+      // img: 'list',
+    });  
   } catch(err) {
     console.error(err);
   }
 });
+
 // 이미지 파일 올리면
 // 그걸 미리보기로 바로 보여줘야 한다. 
 // 그래서 upload파일에 올려야 한다.

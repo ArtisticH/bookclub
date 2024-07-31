@@ -70,6 +70,7 @@ const LogInForm = ({ formLogin, dispatch, LogIn, members }) => {
   // 로그인을 진행할때
   const Submit = useCallback(async (e) => {
     e.preventDefault();
+    console.log('로그인')
     const email = e.target.email.value;
     const password = e.target.password.value;
     try {

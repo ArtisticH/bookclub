@@ -4,6 +4,7 @@ import BooksContainer from './Containers/Book/BooksContainer';
 import BookContainer from './Containers/Book/BookContainer';
 import MembersContainer from './Containers/MembersContainer';
 import WishlistContainer from './Containers/Wishlist/WishlistContainer';
+import ListContainer from './Containers/Wishlist/ListContainer';
 import TournamentContainer from './Containers/Favorite/TournamentContainer';
 import FavoriteContainer from './Containers/Favorite/FavoriteContainer';
 import RankingContainer from './Containers/Favorite/RankingContainer';
@@ -18,6 +19,7 @@ function App() {
       <Route path="/books/:id" element={<BookContainer />}/>
       <Route path="/members" element={<MembersContainer />}/>
       <Route path="/wishlist/:id" element={<WishlistContainer />}/>
+      <Route path="/list/:forderid/:memberid" element={<ListContainer />}/>
       <Route path="/fun" element={<Fun />}/>
       <Route path="/favorite" element={<FavoriteContainer />}/>
       <Route path="/favorite/:id/:round" element={<TournamentContainer />}/>

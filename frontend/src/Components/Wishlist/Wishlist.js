@@ -114,20 +114,23 @@ const Change = ({ state, dispatch, ContainerDispatch }) => {
     dispatch({ type: "MODAL_CHANGE_CANCEL" });
   }, []);
 
-  const ChangeName = useCallback(async (e) => {
-    e.preventDefault();
-    const title = e.target.title.value;
-    if (!title) {
-      alert("폴더명을 입력하세요");
-      return;
-    }
-    await axios.patch("/wishlist/folder", {
-      id: currentFolder.id,
-      title,
-    });
-    Cancel();
-    changeName(currentFolder.id, title);
-  }, []);
+  const ChangeName = useCallback(
+    async (e) => {
+      e.preventDefault();
+      const title = e.target.title.value;
+      if (!title) {
+        alert("폴더명을 입력하세요");
+        return;
+      }
+      await axios.patch("/wishlist/folder", {
+        id: currentFolder.id,
+        title,
+      });
+      Cancel();
+      changeName(currentFolder.id, title);
+    },
+    [currentFolder]
+  );
 
   return (
     <div className={cx("modal")}>
@@ -169,13 +172,16 @@ const Empty = () => {
 };
 
 const Folder = ({ folder, dispatch }) => {
-  const Click = useCallback((e) => {
-    dispatch({
-      type: "MENU_FOLDER_OPEN",
-      position: { x: e.clientX, y: e.clientY },
-      currentFolder: folder,
-    });
-  }, []);
+  const Click = useCallback(
+    (e) => {
+      dispatch({
+        type: "MENU_FOLDER_OPEN",
+        position: { x: e.clientX, y: e.clientY },
+        currentFolder: folder,
+      });
+    },
+    [folder]
+  );
   return (
     <div className={cx("folder")} onContextMenu={Click} data-type="folder">
       <div className={cx("img-box")}>
@@ -189,16 +195,16 @@ const Folder = ({ folder, dispatch }) => {
   );
 };
 
-const Done = ({ done }) => {
-  const Click = useCallback((e) => {
-    console.log("done");
-    // dispatch({
-    //   type: "MENU_FOLDER_OPEN",
-    //   position: { x: e.clientX, y: e.clientY },
-    //   currentFolder: folder
-    // });
-  }, []);
-
+const Done = ({ done, dispatch }) => {
+  const Click = useCallback(
+    (e) => {
+      dispatch({
+        type: "MENU_DONE_OPEN",
+        position: { x: e.clientX, y: e.clientY },
+      });
+    },
+    []
+  );
   return (
     <div className={cx("folder")} onContextMenu={Click} data-type="folder">
       <div className={cx("img-box")}>
@@ -215,13 +221,19 @@ const Done = ({ done }) => {
 const FolderMenu = ({ data, state, dispatch, ContainerDispatch }) => {
   const { id, user } = data;
   const { position, currentFolder } = state;
-  const { deleteFolder } = ContainerDispatch;
+  const { deleteFolder, changePublic } = ContainerDispatch;
+  const navigate = useNavigate();
   const style = useMemo(() => {
     return {
       left: `${position.x}px`,
       top: `${position.y}px`,
     };
   }, [position]);
+
+  const Open = useCallback(async () => {
+    const url = `/list/${currentFolder.id}/${user.id}`;
+    navigate(url);
+  }, [currentFolder, user])
 
   const Change = useCallback(() => {
     if (!user || user.id != id) {
@@ -247,28 +259,113 @@ const FolderMenu = ({ data, state, dispatch, ContainerDispatch }) => {
     if (!answer) {
       dispatch({ type: "NO_MENU_OPEN" });
       return;
-    };
+    }
     await axios.delete(`/wishlist/${currentFolder.id}/${user.id}`);
     deleteFolder(currentFolder.id);
     dispatch({ type: "NO_MENU_OPEN" });
   }, [user]);
 
+  const Public = useCallback(async () => {
+    if (!user || user.id != id) {
+      // 현재 로그인 유저와 이 위시리스트 창의 유저가 같아야 한다.
+      alert("본인 외에는 권한이 없습니다.");
+      dispatch({ type: "NO_MENU_OPEN" });
+      return;
+    }
+    const current = currentFolder.public;
+    const change = !current;
+    // eslint-disable-next-line no-restricted-globals
+    const answer = confirm(
+      `현재 ${current ? "공개" : "비공개"}상태입니다. ${
+        change ? "공개" : "비공개"
+      }상태로 바꾸시겠습니까?`
+    );
+    if (!answer) {
+      dispatch({ type: "NO_MENU_OPEN" });
+      return;
+    }
+    await axios.patch("/wishlist/public", {
+      id: currentFolder.id,
+      public: change,
+      done: false,
+    });
+    changePublic(currentFolder.id, change);
+    dispatch({ type: "NO_MENU_OPEN" });
+  }, [currentFolder]);
   return (
     <div className={cx("folder-menu")} style={style}>
-      <div className={cx("menu")}>열기</div>
+      <div className={cx("menu")} onClick={Open}>열기</div>
       <div className={cx("menu")} onClick={Change}>
         이름 변경
       </div>
       <div className={cx("menu")} onClick={Delete}>
         삭제
       </div>
-      <div className={cx("menu")}>공개&nbsp;/&nbsp;비공개로 전환</div>
+      <div className={cx("menu")} onClick={Public}>
+        공개&nbsp;/&nbsp;비공개로 전환
+      </div>
     </div>
   );
 };
-const BlankMenu = ({ data, state, dispatch }) => {
+
+const DoneFolderMenu = ({ data, state, dispatch, ContainerDispatch }) => {
+  const { id, user, done } = data;
+  const { position } = state;
+  const { changeDonePublic } = ContainerDispatch;
+  const navigate = useNavigate();
+  const style = useMemo(() => {
+    return {
+      left: `${position.x}px`,
+      top: `${position.y}px`,
+    };
+  }, [position]);
+
+  const Open = useCallback(async () => {
+    const url = `/donelist/${user.id}`;
+    navigate(url);
+  }, [user])
+
+  const Public = useCallback(async () => {
+    if (!user || user.id != id) {
+      // 현재 로그인 유저와 이 위시리스트 창의 유저가 같아야 한다.
+      alert("본인 외에는 권한이 없습니다.");
+      dispatch({ type: "NO_MENU_OPEN" });
+      return;
+    }
+    const current = done.public;
+    const change = !current;
+    // eslint-disable-next-line no-restricted-globals
+    const answer = confirm(
+      `현재 ${current ? "공개" : "비공개"}상태입니다. ${
+        change ? "공개" : "비공개"
+      }상태로 바꾸시겠습니까?`
+    );
+    if (!answer) {
+      dispatch({ type: "NO_MENU_OPEN" });
+      return;
+    }
+    await axios.patch("/wishlist/public", {
+      id: user.id,
+      public: change,
+      done: true,
+    });
+    changeDonePublic(change);
+    dispatch({ type: "NO_MENU_OPEN" });
+  }, [done]);
+  return (
+    <div className={cx("folder-menu")} style={style}>
+      <div className={cx("menu")} onClick={Open}>열기</div>
+      <div className={cx("menu")} onClick={Public}>
+        공개&nbsp;/&nbsp;비공개로 전환
+      </div>
+    </div>
+  );
+};
+
+const BlankMenu = ({ data, state, dispatch, ContainerDispatch }) => {
   const { id, user, total } = data;
   const { position } = state;
+  const { newFolders } = ContainerDispatch;
   const [visible, setVisible] = useState(false);
   const style = useMemo(() => {
     return {
@@ -300,6 +397,26 @@ const BlankMenu = ({ data, state, dispatch }) => {
     dispatch({ type: "MODAL_ADD_OPEN" });
   }, [user]);
 
+  const Sort = useCallback(
+    async (sort, order) => {
+      if (!user || user.id != id) {
+        // 현재 로그인 유저와 이 위시리스트 창의 유저가 같아야 한다.
+        alert("본인 외에는 권한이 없습니다.");
+        dispatch({ type: "NO_MENU_OPEN" });
+        return;
+      }
+      const res = await axios.post("/wishlist/sort", {
+        sort,
+        MemberId: user.id,
+        order,
+      });
+      const { folders } = res.data;
+      dispatch({ type: "NO_MENU_OPEN" });
+      newFolders(folders);
+    },
+    [user]
+  );
+
   return (
     <div className={cx("blank-menu")} style={style}>
       <div className={cx("menu")} onClick={Add}>
@@ -317,9 +434,15 @@ const BlankMenu = ({ data, state, dispatch }) => {
           alt="arrow"
         />
         <div className={cx("sort-menu", { visible })}>
-          <div className={cx("menu")}>이름</div>
-          <div className={cx("menu")}>수정일</div>
-          <div className={cx("menu")}>생성일</div>
+          <div className={cx("menu")} onClick={() => Sort("title", "ASC")}>
+            이름
+          </div>
+          <div className={cx("menu")} onClick={() => Sort("updatedAt", "DESC")}>
+            수정일
+          </div>
+          <div className={cx("menu")} onClick={() => Sort("createdAt", "ASC")}>
+            생성일
+          </div>
         </div>
       </div>
     </div>
@@ -381,7 +504,7 @@ const Wishlist = ({ data, loading, ContainerDispatch }) => {
                       dispatch={dispatch}
                     />
                   ))}
-                  <Done done={done} />
+                  <Done done={done} dispatch={dispatch} />
                 </>
               )}
             </div>
@@ -394,7 +517,20 @@ const Wishlist = ({ data, loading, ContainerDispatch }) => {
               />
             )}
             {menu.blank && (
-              <BlankMenu data={data} state={state} dispatch={dispatch} />
+              <BlankMenu
+                data={data}
+                state={state}
+                dispatch={dispatch}
+                ContainerDispatch={ContainerDispatch}
+              />
+            )}
+            {menu.done && (
+              <DoneFolderMenu
+                data={data}
+                state={state}
+                dispatch={dispatch}
+                ContainerDispatch={ContainerDispatch}
+              />
             )}
           </div>
           {modal.add && (
