@@ -195,6 +195,163 @@ router.post('/like', async (req, res) => {
   }
 });
 
+// 수정
+router.patch('/', async (req, res) => {
+  try {
+    const id = req.body.id;
+    const bookId = req.body.BookId;
+    await Review.update({
+      title: req.body.title,
+      text: req.body.text,
+      overText: req.body.overText,
+      stars: req.body.stars,
+    }, {
+      where: { id },
+      include: [{
+        model: Book,
+        where: { id: bookId },
+      }],
+    });
+    const stars = await Review.findAll({
+      include: [{
+        model: Book,
+        where: { id: bookId },
+      }],
+      attributes: ['stars'],
+    });
+    const sum = makeSum(stars);
+    const { starArr, starNum } = makeStar(sum);
+    // 업데이트된 친구
+    const result = await Review.findOne({
+      include: [{
+        model: Book,
+        where: { id: bookId },
+      }, {
+        model: Member,
+        attributes: ['id', 'type', 'nick'],
+      }],
+      where: { id },
+    });
+    const review = {
+      id: result.id,
+      title: result.title,
+      like: result.like,
+      text: makeText(result.overText, result.text),
+      overText: result.overText,
+      createdAt: makeDate(result.createdAt),
+      updatedAt: makeDate(result.updatedAt),
+      stars: makeStar(result.stars).starArr,
+      MemberId: result.Member.id,
+      type: result.Member.type,
+      nick: result.Member.nick,
+    };
+    res.json({
+      review,
+      starArr,
+      starNum,
+    });  
+  } catch(err) {
+    console.error(err);
+  }
+});
+// 삭제
+router.delete('/:reviewid/:bookid/:page', async (req, res) => {
+  try {
+    const id = req.params.reviewid;
+    const bookId = req.params.bookid;
+    const page = req.params.page;
+    await Review.destroy({
+      where: { id },
+      include: [{
+        model: Book,
+        where: { id: bookId },
+      }],
+    });
+    const stars = await Review.findAll({
+      include: [{
+        model: Book,
+        where: { id: bookId },
+      }],
+      attributes: ['stars'],
+    });
+    const sum = makeSum(stars);
+    const { starArr, starNum } = makeStar(sum);
+    const offset = 5 * (page - 1);
+    const results = await Review.findAll({
+      include: [{
+        model: Book,
+        where: { id: bookId },
+      }, {
+        model: Member,
+        attributes: ['id', 'type', 'nick'],
+      }],
+      offset,
+      limit: 5,
+      order: [['id', 'DESC']], // 내림차순
+    });
+    const newReviews =  results.map(item => {
+      return {
+        id: item.id,
+        title: item.title,
+        text: makeText(item.overText, item.text),
+        like: item.like,
+        overText: item.overText,
+        stars: makeStar(item.stars).starArr,
+        createdAt: makeDate(item.createdAt),
+        updatedAt: makeDate(item.updatedAt),
+        MemberId: item.MemberId,
+        type: item.Member.type,
+        nick: item.Member.nick,  
+      }
+    });
+    res.json({
+      newReviews,
+      starArr,
+      starNum,
+    });  
+  } catch(err) {
+    console.error(err);
+  }
+});
+// 페이지 버튼 클릭 시
+router.get('/page/:bookid/:page', async (req, res) => {
+  try {
+    const bookId = req.params.bookid;
+    const page = req.params.page;
+    // 만약 페이지 4를 클릭하면 15개를 건너뛰고 그 다음 5개를 가져와야 한다. 
+    const offset = 5 * (page - 1);
+    const results = await Review.findAll({
+      include: [{
+        model: Book,
+        where: { id: bookId },
+      }, {
+        model: Member,
+        attributes: ['id', 'type', 'nick'],
+      }],
+      offset,
+      limit: 5,
+      order: [['id', 'DESC']], // 내림차순
+    });
+    const reviews =  results.map(item => {
+      return {
+        id: item.id,
+        title: item.title,
+        text: makeText(item.overText, item.text),
+        like: item.like,
+        overText: item.overText,
+        stars: makeStar(item.stars).starArr,
+        createdAt: makeDate(item.createdAt),
+        updatedAt: makeDate(item.updatedAt),
+        MemberId: item.MemberId,
+        type: item.Member.type,
+        nick: item.Member.nick,  
+      }
+    });
+    res.json({ reviews });  
+  } catch(err) {
+    console.error(err);
+  }
+});
 
 
 module.exports = router;

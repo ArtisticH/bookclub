@@ -22,8 +22,7 @@ const gradient = [
 const background = ["#0c3aa5", "#f1ca0b", "#039754", "#ab181b"];
 const title = ["Books", "Members", "WISHLIST", "Fun"];
 
-const TopLeft = ({ login, state, dispatch }) => {
-  const { index } = state;
+const TopLeft = ({ login, index, dispatch }) => {
   // formLogin과 formSignup값이 true가 되고
   // <LogInForm>과 <SignUpForm>에서 클래스 조건부를 { visible: true }로 만들어 폼을 등장시킨다.
   const ClickLogIn = useCallback(() => {
@@ -63,10 +62,7 @@ const TopLeft = ({ login, state, dispatch }) => {
   );
 };
 
-const LogInForm = ({ state, dispatch, LogIn, members }) => {
-  const {
-    form: { formLogin },
-  } = state;
+const LogInForm = ({ formLogin, dispatch, LogIn, members }) => {
   // formLogin = false;
   const CancelLogIn = useCallback(() => {
     dispatch({ type: "FORM_CANCEL_LOGIN" });
@@ -137,10 +133,7 @@ const LogInForm = ({ state, dispatch, LogIn, members }) => {
   );
 };
 
-const SignUpForm = ({ state, dispatch }) => {
-  const {
-    form: { formSignup },
-  } = state;
+const SignUpForm = ({ formSignup, dispatch }) => {
   const CancelSignUp = useCallback(() => {
     dispatch({ type: "FORM_CANCEL_SIGNUP" });
   }, []);
@@ -208,8 +201,7 @@ const SignUpForm = ({ state, dispatch }) => {
   );
 };
 
-const BotLeft = ({ state }) => {
-  const { index } = state;
+const BotLeft = ({ index }) => {
   return (
     <div
       className={cx("bot-left")}
@@ -218,8 +210,7 @@ const BotLeft = ({ state }) => {
   );
 };
 
-const TopRight = ({ state, dispatch }) => {
-  const { index } = state;
+const TopRight = ({ index, dispatch }) => {
   const Right = useRef(null);
   const Scroll = useRef(null);
   useEffect(() => {
@@ -405,6 +396,8 @@ const Home = ({ user, loading, login, members, LogIn, LogOut }) => {
     range: { start, end },
     step,
     wishlist,
+    index,
+    form: { formLogin, formSignup },
   } = state;
 
   const scrollHandler = (e) => {
@@ -429,7 +422,9 @@ const Home = ({ user, loading, login, members, LogIn, LogOut }) => {
 
   useEffect(() => {
     // 시작과 끝이 정해지면 구간을 정한다. 
-    dispatch({ type: "SET_STEP" });
+    if(start && end) {
+      dispatch({ type: "SET_STEP" });
+    }
   }, [start, end]);
 
   useEffect(() => {
@@ -449,23 +444,23 @@ const Home = ({ user, loading, login, members, LogIn, LogOut }) => {
           <div className={cx("home")}>
             <div className={cx("sticky")}>
               <div className={cx("top")}>
-                <TopLeft login={login} state={state} dispatch={dispatch} />
+                <TopLeft login={login} index={index} dispatch={dispatch} />
                 {/* 로그인 안한 경우에만 노출 */}
                 {!login && (
                   <>
                     <LogInForm
-                      state={state}
+                      formLogin={formLogin}
                       dispatch={dispatch}
                       LogIn={LogIn}
                       members={members}
                     />
-                    <SignUpForm state={state} dispatch={dispatch} />
+                    <SignUpForm formSignup={formSignup} dispatch={dispatch} />
                   </>
                 )}
-                <TopRight state={state} dispatch={dispatch} />
+                <TopRight index={index} dispatch={dispatch} />
               </div>
               <div className={cx("bot")}>
-                <BotLeft state={state} />
+                <BotLeft index={index} />
                 <BotRight />
               </div>
             </div>

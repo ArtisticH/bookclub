@@ -1,0 +1,177 @@
+.members {  
+  width: 100%;
+  min-height: 100vh;
+  background-color: #ffffff;
+  background-image: linear-gradient(135deg, #ffffff 25%, #06f304 100%);
+}
+
+.nav {
+  padding: 0 10px;
+  height: 22px;
+  border-bottom: 1px solid black;
+  font-size: 0.9rem;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.title {
+  font-family: var(--font-montserrat);
+  font-size: 1rem;
+  letter-spacing: -2px;
+  font-weight: 200;
+  cursor: pointer;
+}
+
+.name {
+  font-weight: 300;
+  margin-left: 10px;
+  cursor: pointer;
+  line-height: 1;
+  font-family: var(--font-korean);
+}
+
+.books {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.book {
+  cursor: pointer;
+  font-family: var(--font-korean);
+  font-size: 1.3rem;
+  letter-spacing: -2px;
+  font-weight: 100;
+  line-height: 1.2;
+  width: fit-content;
+}
+
+.name.clicked,
+.book.clicked {
+  color: #0c3aa5;
+  color: black;
+  font-weight: 500;
+}
+
+.btn-box {
+  position: fixed;
+  top: 100px;
+  left: 0;
+}
+
+.btn {
+  font-family: var(--font-Merriweather);
+  font-size: 2rem;
+  letter-spacing: -2px;
+  padding: 5px 10px;
+  border: 1px solid black;
+  width: fit-content;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+.home {
+  background-color: #0c3aa5;
+  color: white;
+}
+
+.api {
+  background-color: #ccf407;
+}
+
+.quotes {
+  background-color: #f00284;
+}
+
+.wishlist {
+  border: 1px solid black;
+  background-color: transparent;
+  cursor: auto;
+}
+
+.wishlist.clicked {
+  background-color: #039753;
+  cursor: pointer;
+}
+
+.favorite {
+  background-color: #00f402;
+}
+
+.attend {
+  border: 1px solid black;
+  width: 200px;
+  background-color: white;
+  position: fixed;
+  left: 10px;
+  top: 70%;
+  transform: translateY(-50%);
+}
+
+.rec {
+  border: 1px solid black;
+  width: 250px;
+  background-color: white;
+  position: fixed;
+  left: 30px;
+  bottom: 30px;
+}
+
+.num-title {
+  font-family: var(--font-korean);
+  font-size: 1rem;
+  letter-spacing: -1px;
+  font-weight: 200;
+  margin-bottom: 40px;
+}
+
+.num-box {
+  font-family: var(--font-montserrat);
+  font-size: 3rem;
+  letter-spacing: -5px;
+  color: #039753;
+  font-weight: 400;
+  text-align: end;
+  margin-right: 3px;
+}
+
+
+@media all and (min-width: 1000px) {
+  .book {
+    font-size: 1.7rem;
+    letter-spacing: -3px;
+    line-height: 1.2;
+  }
+
+  .btn {
+    margin-bottom: 10px;
+  }  
+
+  .api {
+    margin-left: 15px;
+  }
+
+  .quotes {
+    margin-left: 30px;
+  }
+
+  .wishlist {
+    margin-left: 45px;
+  }
+
+  .favorite {
+    margin-left: 60px;
+  }
+
+  .attend {
+    left: 40px;
+  }
+  
+  .rec {
+    left: 80px;
+    bottom: 40px;
+  }  
+}

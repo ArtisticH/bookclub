@@ -28,7 +28,7 @@ const Right = ({ books }) => {
     <div className={cx("right")}>
       {/* 책에 대한 정보를 서버에서 가져온 다음 map으로 표기 */}
       {books.map((book) => (
-        <Book book={book} />
+        <Book key={book.id} book={book} />
       ))}
     </div>
   );

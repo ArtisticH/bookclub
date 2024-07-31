@@ -5,9 +5,11 @@ import Book from "../../Components/Book/Book";
 import {
   getBook,
   updateStar,
-  updateTotalReview,
+  addReview,
+  deleteReview,
   updateReviews,
   updateLike,
+  editReviewDispatch,
 } from "../../Modules/Book/Book";
 
 const BookContainer = ({
@@ -15,9 +17,11 @@ const BookContainer = ({
   data,
   getBook,
   updateStar,
-  updateTotalReview,
+  addReview,
+  deleteReview,
   updateReviews,
   updateLike,
+  editReviewDispatch,
 }) => {
   const params = useParams();
   const id = params.id;
@@ -26,15 +30,17 @@ const BookContainer = ({
     getBook(id);
   }, [getBook]);
 
+  const ContainerDispatch = {
+    updateStar,
+    addReview,
+    deleteReview,
+    updateReviews,
+    updateLike,
+    editReviewDispatch,
+  };
+
   return (
-    <Book
-      data={data}
-      loading={loading}
-      updateStar={updateStar}
-      updateTotalReview={updateTotalReview}
-      updateReviews={updateReviews}
-      updateLike={updateLike}
-    />
+    <Book data={data} loading={loading} ContainerDispatch={ContainerDispatch} />
   );
 };
 
@@ -46,8 +52,10 @@ export default connect(
   {
     getBook,
     updateStar,
-    updateTotalReview,
+    addReview,
     updateReviews,
     updateLike,
+    editReviewDispatch,
+    deleteReview,
   }
 )(BookContainer);

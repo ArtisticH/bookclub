@@ -14,21 +14,20 @@ import { componentState, componentReducer } from "../../Modules/Book/Book";
 const cx = classNames.bind(styles);
 
 const Left = ({ data }) => {
-  const { book, totalBook, starArr, starNum, member } = data;
   return (
-    <div className={cx("left")}>
-      <LeftNav book={book} totalBook={totalBook} />
-      <LeftBook
-        book={book}
-        starArr={starArr}
-        starNum={starNum}
-        member={member}
-      />
-    </div>
+    <>
+      {data && (
+        <div className={cx("left")}>
+          <LeftNav data={data} />
+          <LeftBook data={data} />
+        </div>
+      )}
+    </>
   );
 };
 
-const LeftNav = ({ book, totalBook }) => {
+const LeftNav = ({ data }) => {
+  const { book, totalBook } = data;
   return (
     <>
       {book && (
@@ -53,66 +52,74 @@ const LeftNav = ({ book, totalBook }) => {
   );
 };
 
-const LeftBook = ({ book, starArr, starNum, member }) => {
+const LeftBook = ({ data }) => {
+  const { book, starArr, starNum, member } = data;
   return (
-    <div className={cx("left-main")}>
-      <div className={cx("left-grid")}>
-        <div className={cx("book-img")}>
-          <img className="img" src={book.img} alt="book-img" />
-        </div>
-        <div className={cx("book-info")}>
-          <div className={cx("book-title")}>{book.title}</div>
-          <div>
-            <div className={cx("author")}>{book.author}</div>
-            <div className={cx("recommender-box")}>
-              <span>추천이:&nbsp;</span>
-              <Link
-                to={`/members?member=${member.id}`}
-                className={cx("recommender")}
-              >
-                {member.nick}
-              </Link>
+    <>
+      {book && (
+        <div className={cx("left-main")}>
+          <div className={cx("left-grid")}>
+            <div className={cx("book-img")}>
+              <img className="img" src={book.img} alt="book-img" />
             </div>
-            <div className={cx("date-box")}>
-              <span>모임 날짜:&nbsp;</span>
-              <span className={cx("date")}>{book.meetingDate}</span>
-            </div>
-          </div>
-          <div className={cx("rate-box")}>
-            <div className={cx("stars-shape")}>
-              {starArr.map((star, index) => (
-                <div key={index} className={cx("star-relative")}>
-                  <div className={cx("star-shape", star)}></div>
+            <div className={cx("book-info")}>
+              <div className={cx("book-title")}>{book.title}</div>
+              <div>
+                <div className={cx("author")}>{book.author}</div>
+                <div className={cx("recommender-box")}>
+                  <span>추천이:&nbsp;</span>
+                  <Link
+                    to={`/members?member=${member && member.id}`}
+                    className={cx("recommender")}
+                  >
+                    {member && member.nick}
+                  </Link>
                 </div>
-              ))}
-            </div>
-            <div className={cx("stars-number")}>
-              <div className={cx("star-current")}>{starNum}</div>
-              <div className={cx("star-total")}>&nbsp;/&nbsp;5</div>
+                <div className={cx("date-box")}>
+                  <span>모임 날짜:&nbsp;</span>
+                  <span className={cx("date")}>{book.meetingDate}</span>
+                </div>
+              </div>
+              <div className={cx("rate-box")}>
+                <div className={cx("stars-shape")}>
+                  {starArr.map((star, index) => (
+                    <div key={index} className={cx("star-relative")}>
+                      <div className={cx("star-shape", `form-${star}`)}></div>
+                    </div>
+                  ))}
+                </div>
+                <div className={cx("stars-number")}>
+                  <div className={cx("star-current")}>{starNum}</div>
+                  <div className={cx("star-total")}>&nbsp;/&nbsp;5</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 
-const Right = ({ data, state, dispatch, updateLike }) => {
-  const { totalReview, reviews, user } = data;
-  const { last, pageArr } = state;
-
+const Right = ({ data, state, dispatch, ContainerDispatch }) => {
+  const { totalReview } = data;
   return (
     <div className={cx("right")}>
-      <RightNav user={user} dispatch={dispatch} totalReview={totalReview} />
+      <RightNav data={data} dispatch={dispatch} />
       {totalReview === 0 ? (
         <Empty />
       ) : (
         <>
-          <Container reviews={reviews} user={user} updateLike={updateLike} />
+          <Container
+            data={data}
+            state={state}
+            ContainerDispatch={ContainerDispatch}
+            dispatch={dispatch}
+          />
           <Pagenation
-            totalReview={totalReview}
-            last={last}
-            pageArr={pageArr}
+            data={data}
+            state={state}
+            ContainerDispatch={ContainerDispatch}
             dispatch={dispatch}
           />
         </>
@@ -121,7 +128,8 @@ const Right = ({ data, state, dispatch, updateLike }) => {
   );
 };
 
-const RightNav = ({ user, dispatch, totalReview }) => {
+const RightNav = ({ data, dispatch }) => {
+  const { totalReview, user } = data;
   const Click = useCallback(() => {
     if (!user) {
       alert("로그인 후 이용 가능합니다.");
@@ -149,22 +157,45 @@ const Empty = () => {
   );
 };
 
-const Container = ({ reviews, user, updateLike }) => {
+const Container = ({
+  data,
+  state,
+  ContainerDispatch,
+  dispatch,
+}) => {
+  const { reviews } = data;
   return (
     <div>
       {reviews.map((review) => (
         <Review
           key={review.id}
+          data={data}
+          state={state}
+          dispatch={dispatch}
+          ContainerDispatch={ContainerDispatch}
           review={review}
-          user={user}
-          updateLike={updateLike}
         />
       ))}
     </div>
   );
 };
 
-const Review = ({ review, user, updateLike }) => {
+const Review = ({
+  data, 
+  state, 
+  dispatch, 
+  ContainerDispatch,
+  review,
+}) => {
+  const { page, last } = state;
+  const { reviews, totalReview, user, book } = data;
+  const BookId = book.id;
+  const {
+    updateLike,
+    updateReviews,
+    updateStar,
+    deleteReview
+  } = ContainerDispatch;
   const Original = useRef(null);
   const Slice = useRef(null);
   const Arrow = useRef(null);
@@ -181,10 +212,25 @@ const Review = ({ review, user, updateLike }) => {
     }
   }, []);
 
-  const ClickEdit = useCallback(() => {}, []);
+  const ClickEdit = useCallback(() => {
+    dispatch({ type: "CLICK_EDIT", review });
+  }, []);
 
-  const ClickDelete = useCallback(() => {}, []);
-
+  const ClickDelete = useCallback(async () => {
+    let res;
+    if (page == last && reviews.length === 1 && totalReview !== 1) {
+      // 마지막 페이지에서 남은 하나 삭제했을때
+      res = await axios.delete(`/books/${review.id}/${BookId}/${page - 1}`);
+      dispatch({ type: "PAGE", payload: page - 1 });
+    } else {
+      res = await axios.delete(`/books/${review.id}/${BookId}/${page}`);
+    }
+    const { starArr, starNum, newReviews } = res.data;
+    updateStar(starArr, starNum);
+    updateReviews(newReviews);
+    deleteReview();
+  }, [page, last, reviews]);
+  // 좋아요 클릭
   const ClickHeart = useCallback(async () => {
     if (!user) {
       alert("로그인 후 이용해주세요");
@@ -202,6 +248,7 @@ const Review = ({ review, user, updateLike }) => {
     } else {
       setBack(false); // 클릭 취소 효과
     }
+    // 서버에서 내려온 reviews에서 현재 글을 찾아 like만 수정
     updateLike(review.id, like);
   }, []);
 
@@ -211,7 +258,10 @@ const Review = ({ review, user, updateLike }) => {
       <div className={cx("review-info")}>
         <div className={cx("review-stars")}>
           {review.stars.map((star, index) => (
-            <div key={index} className={cx("review-star", star)}></div>
+            <div
+              key={index}
+              className={cx("review-star", `review-${star}`)}
+            ></div>
           ))}
         </div>
         <div className={cx("line")}></div>
@@ -231,9 +281,19 @@ const Review = ({ review, user, updateLike }) => {
         {user && user.id == review.MemberId && (
           <div className={cx("review-user")}>
             <div className={cx("line")}></div>
-            <div className={cx("review-edit", "review-common")}>수정</div>
+            <div
+              className={cx("review-edit", "review-common")}
+              onClick={ClickEdit}
+            >
+              수정
+            </div>
             <div className={cx("line")}></div>
-            <div className={cx("review-delete", "review-common")}>삭제</div>
+            <div
+              className={cx("review-delete", "review-common")}
+              onClick={ClickDelete}
+            >
+              삭제
+            </div>
           </div>
         )}
       </div>
@@ -285,31 +345,77 @@ const Review = ({ review, user, updateLike }) => {
   );
 };
 
-const Pagenation = ({ last }) => {
-  const Input = useCallback((e) => {
-    console.log('Input', e.target.value)
-  }, []);
+const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
+  const { last, page } = state;
+  const { updateReviews } = ContainerDispatch;
+  const { book } = data;
+  const BookId = book.id;
 
   const Change = useCallback((e) => {
-    console.log('Change', e.target.value)
+    dispatch({ type: "PAGE", payload: e.target.value });
   }, []);
+
+  const Move = useCallback(async () => {
+    const res = await axios.get(`/books/page/${BookId}/${page}`);
+    const reviews = res.data.reviews;
+    updateReviews(reviews);
+  }, [page]);
+
+  const Last = useCallback(async () => {
+    const res = await axios.get(`/books/page/${BookId}/${last}`);
+    const reviews = res.data.reviews;
+    updateReviews(reviews);
+    dispatch({ type: "PAGE", payload: last });
+  }, [last]);
+
+  const First = useCallback(async () => {
+    const res = await axios.get(`/books/page/${BookId}/${1}`);
+    const reviews = res.data.reviews;
+    updateReviews(reviews);
+    dispatch({ type: "PAGE", payload: 1 });
+  }, []);
+
+  const Next = useCallback(async () => {
+    const target = page != last ? page + 1 : last;
+    const res = await axios.get(`/books/page/${BookId}/${target}`);
+    const reviews = res.data.reviews;
+    updateReviews(reviews);
+    dispatch({ type: "PAGE", payload: target });
+  }, [page]);
+
+  const Before = useCallback(async () => {
+    const target = page != 1 ? page - 1 : 1;
+    const res = await axios.get(`/books/page/${BookId}/${target}`);
+    const reviews = res.data.reviews;
+    updateReviews(reviews);
+    dispatch({ type: "PAGE", payload: target });
+  }, [page]);
 
   return (
     <div className={cx("pagenation")}>
-      <div className={cx("page-btn")}>&lt;&lt;</div>
-      <div className={cx("page-btn")}>&lt;</div>
+      <div className={cx("page-btn")} onClick={First}>
+        &lt;&lt;
+      </div>
+      <div className={cx("page-btn")} onClick={Before}>
+        &lt;
+      </div>
       <input
-        onInput={Input}
         onChange={Change}
         type="text"
         name="page"
         className={cx("page-input")}
-        defaultValue="1"
+        value={page}
       />
       <div className={cx("page-last")}>/&nbsp;&nbsp;{last}</div>
-      <div className={cx("page-move")}>이동</div>
-      <div className={cx("page-btn")}>&gt;</div>
-      <div className={cx("page-btn")}>&gt;&gt;</div>
+      <div className={cx("page-move")} onClick={Move}>
+        이동
+      </div>
+      <div className={cx("page-btn")} onClick={Next}>
+        &gt;
+      </div>
+      <div className={cx("page-btn")} onClick={Last}>
+        &gt;&gt;
+      </div>
     </div>
   );
 };
@@ -318,25 +424,47 @@ const Form = ({
   data,
   state,
   dispatch,
-  updateStar,
-  updateTotalReview,
-  updateReviews,
+  ContainerDispatch,
 }) => {
-  // 창 닫기
-  const Cancel = useCallback(() => {
-    dispatch({ type: "CANCEL_FORM" });
-    dispatch({ type: "RESET_STAR" });
-  }, []);
   const { book, user } = data;
+  const { star, eidtClicked, editReview } = state;
+  const { updateStar, addTotalReview, updateReviews, editReviewDispatch } = ContainerDispatch;
   const BookId = book.id;
-  const { star } = state;
   const Stars = useRef(null);
   const Length = useRef(null);
+  const Textarea = useRef(null);
+  const Title = useRef(null);
+  useEffect(() => {
+    if (eidtClicked) {
+      // 수정을 클릭해 폼을 연거라면 안의 내용을 채워라.
+      Title.current.value = editReview.title;
+      Textarea.current.value = editReview.text.original;
+      Length.textContent = editReview.text.original.value;
+      const stars = editReview.stars;
+      let STAR = 0;
+      [...Stars.current.children].forEach((star, index) => {
+        if (stars[index] === "full") {
+          star.style.opacity = "1";
+          STAR++;
+        } else {
+          star.style.opacity = "";
+        }
+      });
+      // 현재 설정된 갯수를 폼 제출시 갯수로 미리 설정하기
+      dispatch({ type: "STAR", star: STAR });
+    }
+  }, [eidtClicked]);
+  // 창 닫기
+  const Cancel = useCallback(() => {
+    if (eidtClicked) {
+      dispatch({ type: "CANCEL_FORM" });
+    } else {
+      dispatch({ type: "CANCEL_EDIT" });
+    }
+    dispatch({ type: "RESET_STAR" }); // 0으로 리셋
+  }, [eidtClicked]);
   // 클릭한 곳까지 별점 채우기
-  const ClickStar = useCallback((e) => {
-    const target = e.target;
-    const number = target.dataset.star;
-    if (!number) return;
+  const FillStar = useCallback((number) => {
     [...Stars.current.children].forEach((star, index) => {
       if (index <= +number) {
         star.style.opacity = "1";
@@ -344,8 +472,15 @@ const Form = ({
         star.style.opacity = "";
       }
     });
-    // 현재 클릭한 별 갯수 상태에 저장
-    dispatch({ type: "FORM_STAR", star: +number + 1 });
+  });
+  const ClickStar = useCallback((e) => {
+    const target = e.target;
+    const number = target.dataset.star;
+    if (!number) return;
+    // 별점 색상 채우기
+    FillStar(number);
+    // 현재 클릭한 별 갯수 컴포넌트 상태에 저장
+    dispatch({ type: "STAR", star: +number + 1 });
   }, []);
   // 입력할때 글자수 표기, 3000자 이내로 입력하게끔
   const Count = useCallback((e) => {
@@ -383,15 +518,40 @@ const Form = ({
       });
       const { starArr, starNum, reviews } = res.data;
       Cancel();
+      // 아래 내용은 서버에서 온 데이터를 다루는거라 따로 컨테이너에서 받아야 한다.
       updateStar(starArr, starNum); // 별 상태 업데이트
-      updateTotalReview(); // 리뷰 하나 추가
+      addTotalReview(); // 리뷰 하나 추가
+      // 어차피 등록은 다 1페이지로 와
       updateReviews(reviews); // 리뷰 최신거 포함 5개로 업데이트
     },
     [star, user]
   );
 
+  const EditSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      const title = e.target.title.value;
+      const text = e.target.text.value;
+      const overText = text.length > 200 ? true : false;
+      const res = await axios.patch(`/books`, {
+        id: editReview.id, // 리뷰아이디
+        title,
+        text,
+        overText,
+        stars: star,
+        BookId,
+      });
+      const { review, starArr, starNum } = res.data;
+      updateStar(starArr, starNum);
+      // 현재 리뷰 5개에서 수정한 리뷰만 바꿔치기
+      editReviewDispatch(review);
+      Cancel();
+    },
+    [star]
+  );
+
   return (
-    <form className={cx("form")} onSubmit={Submit}>
+    <form className={cx("form")} onSubmit={eidtClicked ? EditSubmit : Submit}>
       <div className={cx("form-nav")}>
         <div className={cx("form-title")}>Review</div>
         <div className={cx("cancel")} onClick={Cancel}>
@@ -417,6 +577,7 @@ const Form = ({
       </div>
       <div>
         <input
+          ref={Title}
           type="text"
           name="title"
           className={cx("input-title")}
@@ -431,6 +592,7 @@ const Form = ({
           <span>3000</span>
         </div>
         <textarea
+          ref={Textarea}
           name="text"
           className={cx("textarea")}
           cols="30"
@@ -444,20 +606,15 @@ const Form = ({
   );
 };
 
-const Book = ({
-  loading,
-  data,
-  updateStar,
-  updateTotalReview,
-  updateReviews,
-  updateLike,
-}) => {
+const Book = ({ loading, data, ContainerDispatch }) => {
   const [state, dispatch] = useReducer(componentReducer, componentState);
   const { form } = state;
 
   useEffect(() => {
     if (data) {
       const { totalReview } = data;
+      // 총리뷰개수를 바탕으로 마지막 페이지를 계산
+      // last 상태 변화
       dispatch({ type: "LAST", totalReview });
     }
   }, [data]);
@@ -472,7 +629,7 @@ const Book = ({
               data={data}
               state={state}
               dispatch={dispatch}
-              updateLike={updateLike}
+              ContainerDispatch={ContainerDispatch}
             />
           </div>
           {form && (
@@ -480,9 +637,7 @@ const Book = ({
               data={data}
               state={state}
               dispatch={dispatch}
-              updateStar={updateStar}
-              updateTotalReview={updateTotalReview}
-              updateReviews={updateReviews}
+              ContainerDispatch={ContainerDispatch}
             />
           )}
         </>

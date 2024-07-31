@@ -124,15 +124,15 @@
   height: 100%;
 }
 
-.star-shape.full {
+.star-shape.form-full {
   clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
 }
 
-.star-shape.half {
+.star-shape.form-half {
   clip-path: polygon(50% 0%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
 }
 
-.star-shape.empty {
+.star-shape.form-empty {
   background-color: transparent;
   clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
 }
@@ -226,11 +226,11 @@
   clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
 }
 
-.review-star.full {
+.review-star.review-full {
   background-color: #0c3aa5;
 }
 
-.review-star.empty {
+.review-star.review-empty {
   background-color: grey;
   opacity: 0.5;
 }
@@ -332,11 +332,11 @@
   display: block;
   position: absolute;
   top: 0;
+  transition: all 0.4s ease-out;
   left: 0;
 }
 
 .heart-img.back {
-  transition: all 1s ease-out;
   transform: translateY(-200%);
   opacity: 0;
 }
