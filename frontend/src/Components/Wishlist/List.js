@@ -134,12 +134,67 @@ const Add = ({ data, dispatch, ContainerDispatch }) => {
   );
 };
 
-const Move = ({ data, dispatch }) => {
+const Move = ({ state, data, dispatch, ContainerDispatch }) => {
+  const { FolderId, lists, member, count } = data;
+  const { selected, page, last } = state;
+  const { updateLists, deleteLists, updateOthers } = ContainerDispatch
   const Cancel = useCallback(() => {
     dispatch({ type: "MODAL_MOVE_CANCEL" });
   });
 
-  const Submit = useCallback(() => {}, []);
+  const Submit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      const radios = document.getElementsByName("listFolder");
+      let isSelected = false;
+      let targetId;
+      for (const radio of radios) {
+        if (radio.checked) {
+          isSelected = true;
+          targetId = radio.value;
+          break;
+        }
+      }
+      if (!isSelected) {
+        alert("이동할 폴더를 선택해주세요.");
+        return;
+      }
+      const text = "해당 리스트들을 선택한 폴더로 이동하시겠습니까?";
+      // eslint-disable-next-line no-restricted-globals
+      if (!confirm(text)) {
+        Cancel();
+        return;
+      }
+      const id = JSON.stringify(selected);
+      let res;
+      if (page == last && lists.length === 1 && count !== 1) {
+        // 마지막 페이지에서 남은 하나 삭제했을때
+        res = await axios.post(`/list/move`, {
+          id,
+          FolderId,
+          MemberId: member.id,
+          targetId,
+          page: page - 1,
+        });
+        dispatch({ type: "PAGE", payload: page - 1 });
+      } else {
+        res = await axios.post(`/list/move`, {
+          id,
+          FolderId,
+          MemberId: member.id,
+          targetId,
+          page,
+        });
+      }
+      const { newLists, others } = res.data;
+      updateLists(newLists);
+      deleteLists(selected.length);
+      updateOthers(others);
+      Cancel()
+      dispatch({ type: "RESET_SELECTED" });
+    },
+    [selected, member, FolderId, page, last, lists, count]
+  );
 
   return (
     <div className={cx("modal", "move")}>
@@ -157,7 +212,7 @@ const Move = ({ data, dispatch }) => {
           <form className={cx("move-form")} onSubmit={Submit}>
             {data.others &&
               data.others.map((other) => (
-                <label className={cx("move-label")}>
+                <label key={other.id} className={cx("move-label")}>
                   <div>
                     <input type="radio" name="listFolder" value={other.id} />
                     <span className={cx("move-span")}>{other.title}</span>
@@ -216,7 +271,6 @@ const Btns = ({ data, state, dispatch, ContainerDispatch }) => {
   const Add = useCallback(() => {
     if (!user || user.id != member.id) {
       alert("본인 외에는 권한이 없습니다.");
-      dispatch({ type: "NO_MODAL_OPEN" });
       return;
     }
     dispatch({ type: "MODAL_ADD_OPEN" });
@@ -225,16 +279,22 @@ const Btns = ({ data, state, dispatch, ContainerDispatch }) => {
   const Move = useCallback(() => {
     if (!user || user.id != member.id) {
       alert("본인 외에는 권한이 없습니다.");
-      dispatch({ type: "NO_MODAL_OPEN" });
+      return;
+    }
+    if (!selected.length) {
+      alert("먼저 이동할 리스트들을 선택해주세요.");
       return;
     }
     dispatch({ type: "MODAL_MOVE_OPEN" });
-  }, [user, member]);
+  }, [user, member, selected]);
 
   const Delete = useCallback(async () => {
     if (!user || user.id != member.id) {
       alert("본인 외에는 권한이 없습니다.");
-      dispatch({ type: "NO_MODAL_OPEN" });
+      return;
+    }
+    if (!selected.length) {
+      alert("먼저 삭제할 리스트들을 선택해주세요.");
       return;
     }
     let res;
@@ -261,6 +321,40 @@ const Btns = ({ data, state, dispatch, ContainerDispatch }) => {
     dispatch({ type: "RESET_SELECTED" });
   }, [user, member, page, last, lists, selected]);
 
+  const Read = useCallback(async () => {
+    if (!user || user.id != member.id) {
+      alert("본인 외에는 권한이 없습니다.");
+      return;
+    }
+    if (!selected.length) {
+      alert("먼저 완독한 리스트들을 선택해주세요.");
+      return;
+    }
+    let res;
+    const id = JSON.stringify(selected);
+    if (page == last && lists.length === 1 && count !== 1) {
+      // 마지막 페이지에서 남은 하나 삭제했을때
+      res = await axios.post(`/list/read`, {
+        id,
+        FolderId,
+        MemberId: member.id,
+        page: page - 1
+      });
+      dispatch({ type: "PAGE", payload: page - 1 });
+    } else {
+      res = await axios.post(`/list/read`, {
+        id,
+        FolderId,
+        MemberId: member.id,
+        page,
+      });
+    }
+    const { newLists } = res.data;
+    updateLists(newLists);
+    deleteLists(selected.length);
+    dispatch({ type: "RESET_SELECTED" });
+  }, [user, member, page, last, lists, selected]);
+
   return (
     <div className={cx("btns")}>
       <div className={cx("btn")} onClick={Add}>
@@ -272,7 +366,9 @@ const Btns = ({ data, state, dispatch, ContainerDispatch }) => {
       <div className={cx("btn")} onClick={Move}>
         폴더 이동
       </div>
-      <div className={cx("btn")}>완독</div>
+      <div className={cx("btn")} onClick={Read}>
+        완독
+      </div>
     </div>
   );
 };
@@ -311,12 +407,20 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
   }, []);
 
   const Move = useCallback(async () => {
+    if(page > last) {
+      alert('존재하지 않는 페이지입니다.');
+      return;
+    }
     const res = await axios.get(`/list/page/${FolderId}/${member.id}/${page}`);
     const lists = res.data.lists;
     updateLists(lists);
   }, [page]);
 
   const Last = useCallback(async () => {
+    if(page == last) {
+      alert('마지막 페이지입니다.');
+      return;
+    }
     const res = await axios.get(`/list/page/${FolderId}/${member.id}/${last}`);
     const lists = res.data.lists;
     updateLists(lists);
@@ -324,6 +428,10 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
   }, [last]);
 
   const First = useCallback(async () => {
+    if(page == 1) {
+      alert('첫 페이지입니다.');
+      return;
+    }
     const res = await axios.get(`/list/page/${FolderId}/${member.id}/${1}`);
     const lists = res.data.lists;
     updateLists(lists);
@@ -331,6 +439,10 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
   }, []);
 
   const Next = useCallback(async () => {
+    if(page == last) {
+      alert('마지막 페이지입니다.');
+      return;
+    }
     const target = page != last ? page + 1 : last;
     const res = await axios.get(
       `/list/page/${FolderId}/${member.id}/${target}`
@@ -341,6 +453,10 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
   }, [page, last]);
 
   const Before = useCallback(async () => {
+    if(page == 1) {
+      alert('첫 페이지입니다.');
+      return;
+    }
     const target = page != 1 ? page - 1 : 1;
     const res = await axios.get(
       `/list/page/${FolderId}/${member.id}/${target}`
@@ -443,7 +559,14 @@ const List = ({ loading, data, ContainerDispatch }) => {
               ContainerDispatch={ContainerDispatch}
             />
           )}
-          {modal.move && <Move data={data} dispatch={dispatch} />}
+          {modal.move && (
+            <Move
+              state={state}
+              data={data}
+              dispatch={dispatch}
+              ContainerDispatch={ContainerDispatch}
+            />
+          )}
         </>
       )}
     </>

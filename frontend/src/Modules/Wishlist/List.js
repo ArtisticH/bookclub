@@ -8,6 +8,7 @@ const GET_LIST_FAILURE = "LIST/GET_LIST_FAILURE";
 const ADD_LIST = "LIST/ADD_LIST";
 const UPDATE_LISTS = "LIST/UPDATE_LISTS";
 const DELETE_LISTS = "LIST/DELETE_LISTS";
+const UPDATE_OTHERS = "LIST/UPDATE_OTHERS";
 
 const getList = (forderId, memberId) => async (dispatch) => {
   dispatch({ type: GET_LIST });
@@ -57,6 +58,11 @@ const list = handleActions(
       produce(state, (draft) => {
         draft.data.count -= action.payload;
       }),
+    [UPDATE_OTHERS]: (state, action) =>
+    produce(state, (draft) => {
+      draft.data.others = action.payload;
+    }),
+    
   },
   containerState
 );
@@ -64,7 +70,7 @@ const list = handleActions(
 const addList = () => ({ type: ADD_LIST });
 const updateLists = (lists) => ({ type: UPDATE_LISTS, payload: lists });
 const deleteLists = (length) => ({ type: DELETE_LISTS, payload: length });
-
+const updateOthers = (others) => ({ type: UPDATE_OTHERS, payload: others });
 const componentState = {
   modal: {
     add: false,
@@ -131,6 +137,7 @@ export {
   addList,
   updateLists,
   deleteLists,
+  updateOthers,
   componentState,
   componentReducer,
 };

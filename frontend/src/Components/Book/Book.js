@@ -356,12 +356,20 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
   }, []);
 
   const Move = useCallback(async () => {
+    if(page > last) {
+      alert('존재하지 않는 페이지입니다.');
+      return;
+    }
     const res = await axios.get(`/books/page/${BookId}/${page}`);
     const reviews = res.data.reviews;
     updateReviews(reviews);
   }, [page]);
 
   const Last = useCallback(async () => {
+    if(page == last) {
+      alert('마지막 페이지입니다.');
+      return;
+    }
     const res = await axios.get(`/books/page/${BookId}/${last}`);
     const reviews = res.data.reviews;
     updateReviews(reviews);
@@ -369,6 +377,10 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
   }, [last]);
 
   const First = useCallback(async () => {
+    if(page == 1) {
+      alert('첫 페이지입니다.');
+      return;
+    }
     const res = await axios.get(`/books/page/${BookId}/${1}`);
     const reviews = res.data.reviews;
     updateReviews(reviews);
@@ -376,6 +388,10 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
   }, []);
 
   const Next = useCallback(async () => {
+    if(page == last) {
+      alert('마지막 페이지입니다.');
+      return;
+    }
     const target = page != last ? page + 1 : last;
     const res = await axios.get(`/books/page/${BookId}/${target}`);
     const reviews = res.data.reviews;
@@ -384,6 +400,10 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
   }, [page]);
 
   const Before = useCallback(async () => {
+    if(page == 1) {
+      alert('첫 페이지입니다.');
+      return;
+    }
     const target = page != 1 ? page - 1 : 1;
     const res = await axios.get(`/books/page/${BookId}/${target}`);
     const reviews = res.data.reviews;

@@ -173,7 +173,6 @@ const Empty = () => {
 
 const Folder = ({ state, data, folder, dispatch }) => {
   const { user, id } = data;
-  const { currentFolder } = state;
   const navigate = useNavigate();
 
   const Click = useCallback(
@@ -188,14 +187,14 @@ const Folder = ({ state, data, folder, dispatch }) => {
   );
 
   const Open = useCallback(async () => {
-    if (!currentFolder.public && user.id != id) {
+    if (!folder.public && user.id != id) {
       // 비공개폴더인데 본인이 아닐때
       alert("비공개 폴더입니다.");
       return;
     }
-    const url = `/list/${currentFolder.id}/${user.id}`;
+    const url = `/list/${folder.id}/${user.id}`;
     navigate(url);
-  }, [currentFolder, user, id]);
+  }, [user, id]);
 
   return (
     <div
@@ -216,7 +215,6 @@ const Folder = ({ state, data, folder, dispatch }) => {
 };
 
 const Done = ({ state, data, done, dispatch }) => {
-  const { currentFolder } = state;
   const { user, id } = data;
   const navigate = useNavigate();
   const Click = useCallback((e) => {
@@ -227,14 +225,14 @@ const Done = ({ state, data, done, dispatch }) => {
   }, []);
 
   const Open = useCallback(async () => {
-    if (!currentFolder.public && user.id != id) {
+    if (!done.public && user.id != id) {
       // 비공개폴더인데 본인이 아닐때
       alert("비공개 폴더입니다.");
       return;
     }
     const url = `/donelist/${user.id}`;
     navigate(url);
-  }, [user, currentFolder, id]);
+  }, [user, id]);
 
   return (
     <div

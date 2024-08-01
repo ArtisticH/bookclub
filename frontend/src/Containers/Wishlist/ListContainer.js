@@ -6,7 +6,8 @@ import {
   getList,
   addList,
   updateLists,
-  deleteLists
+  deleteLists,
+  updateOthers
 } from "../../Modules/Wishlist/List";
 
 const ListContainer = ({
@@ -15,7 +16,8 @@ const ListContainer = ({
   getList,
   addList,
   updateLists,
-  deleteLists
+  deleteLists,
+  updateOthers
 }) => {
 
   const params = useParams();
@@ -25,7 +27,8 @@ const ListContainer = ({
   const ContainerDispatch = {
     addList,
     updateLists,
-    deleteLists
+    deleteLists,
+    updateOthers
   }
 
   useEffect(() => {
@@ -46,6 +49,7 @@ export default connect(
     getList,
     addList,
     updateLists,
-    deleteLists
+    deleteLists,
+    updateOthers
   }
 )(ListContainer);
