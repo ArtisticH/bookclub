@@ -53,10 +53,10 @@ const componentState = {
     add: false,
     result: false,
   },
-  select: null,
   lists: [],
   option: null,
   kwd: null,
+  select: null,
 };
 
 function componentReducer(state, action) {
@@ -93,6 +93,22 @@ function componentReducer(state, action) {
         draft.lists = action.lists;
         draft.option = action.option;
         draft.kwd = action.kwd;
+      });
+    case "CLICK_WISHLIST":
+      return produce(state, (draft) => {
+        draft.modal.move = true;
+        draft.folders = action.folders;
+        draft.select = action.list;
+      });
+    case "CLICK_WISHLIST":
+      return produce(state, (draft) => {
+        draft.modal.move = true;
+        draft.folders = action.folders;
+        draft.select = action.list;
+      });
+    case "RESET_SELECT":
+      return produce(state, (draft) => {
+        draft.select = null;
       });
   }
 }

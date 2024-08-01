@@ -211,6 +211,31 @@ router.post("/exist", async (req, res) => {
     console.error(err);
   }
 });
+// 
+router.post("/search/exist", async (req, res) => {
+  try {
+    // 선택된 아이들을 특정 유저의 특정 폴더에 추가한다.
+    const MemberId = req.body.MemberId;
+    const FolderId = req.body.FolderId;
+    const list = JSON.parse(req.body.list);
+    // 우선 폴더의 갯수를 늘리고
+    await Folder.increment("count", {
+      by: ids.length,
+      where: { id: FolderId },
+    });
+    await List.create({
+      FolderId,
+      title: list.title,
+      author: list.author,
+      img: list.img,
+      MemberId,
+    });
+    res.json({});
+  } catch (err) {
+    console.error(err);
+  }
+});
+
 // 새로운 폴더 추가
 router.post("/add", async (req, res) => {
   try {
@@ -244,6 +269,32 @@ router.post("/add", async (req, res) => {
     console.error(err);
   }
 });
+// 새로운 폴더 추가
+router.post("/search/add", async (req, res) => {
+  try {
+    const MemberId = req.body.MemberId;
+    const title = req.body.title;
+    const isPublic = req.body.isPublic === "public" ? true : false;
+    const list = JSON.parse(req.body.list);
+    const folder = await Folder.create({
+      title,
+      MemberId,
+      public: isPublic,
+      count: 1,
+    });
+    await List.create({
+      FolderId: folder.id,
+      title: list.title,
+      author: list.author,
+      img: list.img,
+      MemberId,
+    });
+    res.json({});
+  } catch (err) {
+    console.error(err);
+  }
+});
+
 // 소장 자료 검색 결과 반환
 router.post("/search", async (req, res) => {
   try {

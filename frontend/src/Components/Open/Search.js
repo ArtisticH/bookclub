@@ -7,155 +7,152 @@ import { componentState, componentReducer } from "../../Modules/Open/Search";
 
 const cx = classNames.bind(styles);
 
-// const AddFolder = ({ dispatch, state, data }) => {
-//   const { select } = state;
-//   const { user } = data;
-//   const Cancel = useCallback(() => {
-//     dispatch({ type: "NO_MODAL" });
-//   }, []);
+const AddFolder = ({ dispatch, state, user }) => {
+  const { select } = state;
+  const Cancel = useCallback(() => {
+    dispatch({ type: "NO_MODAL" });
+  }, []);
 
-//   const Submit = useCallback(
-//     async (e) => {
-//       e.preventDefault();
-//       const title = e.target.title.value;
-//       const isPublic = e.target.isPublic.value;
-//       if (!title || !isPublic) {
-//         alert("모든 입력 요소를 채워주세요.");
-//         return;
-//       }
-//       await axios.post("/open/add", {
-//         MemberId: user.id,
-//         title,
-//         isPublic,
-//         ids: JSON.stringify(selected),
-//         type: paramsType,
-//       });
-//       Cancel();
-//       dispatch({ type: "RESET_SELECTED" });
-//       alert("폴더 생성 후 등록이 완료되었습니다!");
-//     },
-//     [selected, user]
-//   );
+  const Submit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      const title = e.target.title.value;
+      const isPublic = e.target.isPublic.value;
+      if (!title || !isPublic) {
+        alert("모든 입력 요소를 채워주세요.");
+        return;
+      }
+      await axios.post("/open/search/add", {
+        MemberId: user.id,
+        title,
+        isPublic,
+        list: JSON.stringify(select),
+      });
+      Cancel();
+      dispatch({ type: "RESET_SELECT" });
+      alert("폴더 생성 후 등록이 완료되었습니다!");
+    },
+    [select, user]
+  );
 
-//   return (
-//     <div className={cx("modal")}>
-//       <div className={cx("modal-nav", "add")}>
-//         <div className={cx("modal-title")}>폴더 추가 후 등록</div>
-//         <div className={cx("cancel")} onClick={Cancel}>
-//           <div className={cx("cancel-left")}></div>
-//           <div className={cx("cancel-right")}></div>
-//         </div>
-//       </div>
-//       <form className={cx("form-add")} onSubmit={Submit}>
-//         <div className={cx("radio-box")}>
-//           <label className={cx("add-label")}>
-//             <input
-//               className={cx("add-radio")}
-//               id="public"
-//               type="radio"
-//               name="isPublic"
-//               value="public"
-//             />
-//             <span>PUBLIC</span>
-//           </label>
-//           <label>
-//             <input
-//               className={cx("add-radio")}
-//               id="private"
-//               type="radio"
-//               name="isPublic"
-//               value="private"
-//             />
-//             <span>PRIVATE</span>
-//           </label>
-//         </div>
-//         <input
-//           className={cx("add-input")}
-//           type="text"
-//           placeholder="15자 이내로 폴더 이름을 입력하세요*"
-//           name="title"
-//           maxLength="15"
-//         />
-//         <input className={cx("submit")} type="submit" value="추가" />
-//       </form>
-//     </div>
-//   );
-// };
+  return (
+    <div className={cx("modal")}>
+      <div className={cx("modal-nav", "add")}>
+        <div className={cx("modal-title")}>폴더 추가 후 등록</div>
+        <div className={cx("cancel")} onClick={Cancel}>
+          <div className={cx("cancel-left")}></div>
+          <div className={cx("cancel-right")}></div>
+        </div>
+      </div>
+      <form className={cx("form-add")} onSubmit={Submit}>
+        <div className={cx("radio-box")}>
+          <label className={cx("add-label")}>
+            <input
+              className={cx("add-radio")}
+              id="public"
+              type="radio"
+              name="isPublic"
+              value="public"
+            />
+            <span>PUBLIC</span>
+          </label>
+          <label>
+            <input
+              className={cx("add-radio")}
+              id="private"
+              type="radio"
+              name="isPublic"
+              value="private"
+            />
+            <span>PRIVATE</span>
+          </label>
+        </div>
+        <input
+          className={cx("add-input")}
+          type="text"
+          placeholder="15자 이내로 폴더 이름을 입력하세요*"
+          name="title"
+          maxLength="15"
+        />
+        <input className={cx("submit")} type="submit" value="추가" />
+      </form>
+    </div>
+  );
+};
 
-// const Move = ({ dispatch, state, data, paramsType }) => {
-//   const { folders, selected } = state;
-//   const { user } = data;
-//   const ModalAddOpen = useCallback(() => {
-//     dispatch({ type: "MODAL_ADD_OPEN" });
-//   }, []);
+const Move = ({ dispatch, state, user }) => {
+  const { folders, select } = state;
 
-//   const Cancel = useCallback(() => {
-//     dispatch({ type: "NO_MODAL" });
-//   }, []);
+  const ModalAddOpen = useCallback(() => {
+    dispatch({ type: "MODAL_ADD_OPEN" });
+  }, []);
 
-//   const Submit = useCallback(
-//     async (e) => {
-//       e.preventDefault();
-//       const FolderId = e.target.folder.value;
-//       if (!FolderId) {
-//         alert("이동할 폴더를 선택해주세요.");
-//         return;
-//       }
-//       await axios.post("/open/exist", {
-//         ids: JSON.stringify(selected),
-//         FolderId,
-//         MemberId: user.id,
-//         type: paramsType,
-//       });
-//       Cancel();
-//       dispatch({ type: "RESET_SELECTED" });
-//       alert("해당 폴더에 등록이 완료되었습니다!");
-//     },
-//     [user, selected, paramsType]
-//   );
+  const Cancel = useCallback(() => {
+    dispatch({ type: "NO_MODAL" });
+  }, []);
 
-//   return (
-//     <div className={cx("modal")}>
-//       <div className={cx("modal-nav")}>
-//         <div className={cx("modal-title")}>폴더</div>
-//         <div className={cx("cancel")} onClick={Cancel}>
-//           <div className={cx("cancel-left")}></div>
-//           <div className={cx("cancel-right")}></div>
-//         </div>
-//       </div>
-//       <form className={cx("form-folder")} onSubmit={Submit}>
-//         <div className={cx("add-btn-flex")}>
-//           <div className={cx("add-btn")} onClick={ModalAddOpen}>
-//             폴더 추가
-//           </div>
-//         </div>
-//         {folders.length === 0 ? (
-//           <div className={cx("empty")}>먼저 폴더를 추가해주세요.</div>
-//         ) : (
-//           <div className={cx("label-box")}>
-//             {folders.map((folder) => (
-//               <label key={folder.id} className={cx("label")}>
-//                 <div>
-//                   <input
-//                     className={cx("radio")}
-//                     type="radio"
-//                     name="folder"
-//                     value={folder.id}
-//                   />
-//                   <span>{folder.title}</span>
-//                 </div>
-//                 <div>{folder.count}</div>
-//               </label>
-//             ))}
-//           </div>
-//         )}
-//         <input className={cx("submit")} type="submit" value="추가" />
-//       </form>
-//     </div>
-//   );
-// };
+  const Submit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      const FolderId = e.target.folder.value;
+      if (!FolderId) {
+        alert("이동할 폴더를 선택해주세요.");
+        return;
+      }
+      await axios.post("/open/search/exist", {
+        list: JSON.stringify(select),
+        FolderId,
+        MemberId: user.id,
+      });
+      Cancel();
+      dispatch({ type: "RESET_SELECT" });
+      alert("해당 폴더에 등록이 완료되었습니다!");
+    },
+    [user, select]
+  );
 
-const ResultZone = ({ state, dispatch }) => {
+  return (
+    <div className={cx("modal")}>
+      <div className={cx("modal-nav")}>
+        <div className={cx("modal-title")}>폴더</div>
+        <div className={cx("cancel")} onClick={Cancel}>
+          <div className={cx("cancel-left")}></div>
+          <div className={cx("cancel-right")}></div>
+        </div>
+      </div>
+      <form className={cx("form-folder")} onSubmit={Submit}>
+        <div className={cx("add-btn-flex")}>
+          <div className={cx("add-btn")} onClick={ModalAddOpen}>
+            폴더 추가
+          </div>
+        </div>
+        {folders.length === 0 ? (
+          <div className={cx("empty")}>먼저 폴더를 추가해주세요.</div>
+        ) : (
+          <div className={cx("label-box")}>
+            {folders.map((folder) => (
+              <label key={folder.id} className={cx("label")}>
+                <div>
+                  <input
+                    className={cx("radio")}
+                    type="radio"
+                    name="folder"
+                    value={folder.id}
+                  />
+                  <span>{folder.title}</span>
+                </div>
+                <div>{folder.count}</div>
+              </label>
+            ))}
+          </div>
+        )}
+        <input className={cx("submit")} type="submit" value="추가" />
+      </form>
+    </div>
+  );
+};
+
+const ResultZone = ({ state, dispatch, user }) => {
   const { lists, option, kwd } = state;
   const Cancel = useCallback(() => {
     dispatch({ type: "NO_RESULT_MODAL" });
@@ -177,7 +174,15 @@ const ResultZone = ({ state, dispatch }) => {
       <div className={cx("result-line")}></div>
       <div className={cx("result-main")}>
         {lists &&
-          lists.map((list, index) => <Result key={index} list={list} />)}
+          lists.map((list, index) => (
+            <Result
+              key={index}
+              user={user}
+              list={list}
+              state={state}
+              dispatch={dispatch}
+            />
+          ))}
       </div>
       <img src="/img/open/line.png" alt="img" className={cx("line-top")} />
       <img src="/img/open/line.png" alt="img" className={cx("line-bottom")} />
@@ -187,7 +192,16 @@ const ResultZone = ({ state, dispatch }) => {
   );
 };
 
-const Result = ({ list }) => {
+const Result = ({ list, dispatch, user }) => {
+  const Click = useCallback(async () => {
+    if (!user) {
+      alert("로그인 후 이용해주세요.");
+      return;
+    }
+    const res = await axios.get(`/open/folders/${user.id}`);
+    const { folders } = res.data;
+    dispatch({ type: "CLICK_WISHLIST", list, folders });
+  }, [user]);
   return (
     <div className={cx("result-box")}>
       <div className={cx("contents")}>
@@ -195,11 +209,14 @@ const Result = ({ list }) => {
           <img className="img" src={list.img} alt="img" />
         </div>
         <div className={cx("result-info")}>
-          <div className={cx("result-info-title")} dangerouslySetInnerHTML={{ __html: list.title }}></div>
+          <div
+            className={cx("result-info-title")}
+            dangerouslySetInnerHTML={{ __html: list.title }}
+          ></div>
           <div className={cx("result-info-line")}>
-            <span>{list.author}</span>
+            <span dangerouslySetInnerHTML={{ __html: list.author }}></span>
             <span className={cx("result-ver")}></span>
-            <span>{list.pub}</span>
+            <span dangerouslySetInnerHTML={{ __html: list.pub }}></span>
           </div>
           <div className={cx("result-info-line")}>
             <span>{list.year}</span>
@@ -216,12 +233,17 @@ const Result = ({ list }) => {
         <a className={cx("result-btn")} href={list.detail} target="_blank">
           원문 URL
         </a>
-        <div className={cx("result-btn")}>WISHLIST에 추가</div>
+        <div className={cx("result-btn")} onClick={Click}>
+          WISHLIST에 추가
+        </div>
       </div>
     </div>
   );
 };
 const SearchZone = ({ dispatch }) => {
+  const Select = useRef(null);
+  const Input = useRef(null);
+
   const Submit = useCallback(async (e) => {
     e.preventDefault();
     const option = e.target.options.value;
@@ -236,6 +258,8 @@ const SearchZone = ({ dispatch }) => {
     });
     const { lists } = res.data;
     dispatch({ type: "DONE_SEARCH", lists, option, kwd });
+    Input.current.value = "";
+    Select.current.selectedIndex = 0;
   });
 
   return (
@@ -254,7 +278,12 @@ const SearchZone = ({ dispatch }) => {
             src="/img/open/search-select.png"
             alt="img"
           />
-          <select id="targets" name="options" className={cx("select")}>
+          <select
+            id="targets"
+            name="options"
+            className={cx("select")}
+            ref={Select}
+          >
             <option value="전체">전체</option>
             <option value="제목">제목</option>
             <option value="저자">저자</option>
@@ -268,6 +297,7 @@ const SearchZone = ({ dispatch }) => {
             alt="img"
           />
           <input
+            ref={Input}
             className={cx("kwd", "none")}
             type="text"
             name="kwd"
@@ -299,11 +329,13 @@ const Search = ({ loading, user }) => {
       {!loading && (
         <>
           <SearchZone dispatch={dispatch} />
-          {modal.result && <ResultZone state={state} dispatch={dispatch} />}
-          {/* {modal.move && <Move user={user} dispatch={dispatch} state={state} />}
+          {modal.result && (
+            <ResultZone user={user} state={state} dispatch={dispatch} />
+          )}
+          {modal.move && <Move user={user} dispatch={dispatch} state={state} />}
           {modal.add && (
             <AddFolder user={user} state={state} dispatch={dispatch} />
-          )} */}
+          )}
         </>
       )}
     </>
