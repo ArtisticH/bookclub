@@ -8,6 +8,7 @@ import ListContainer from './Containers/Wishlist/ListContainer';
 import DonelistContainer from './Containers/Wishlist/DonelistContainer';
 import Open from './Components/Open/Open';
 import ListsContainer from './Containers/Open/ListsContainer';
+import SearchContainer from './Containers/Open/SearchContainer';
 import TournamentContainer from './Containers/Favorite/TournamentContainer';
 import FavoriteContainer from './Containers/Favorite/FavoriteContainer';
 import RankingContainer from './Containers/Favorite/RankingContainer';
@@ -25,6 +26,7 @@ function App() {
       <Route path="/list/:forderid/:memberid" element={<ListContainer />}/>
       <Route path="/donelist/:memberid" element={<DonelistContainer />}/>
       <Route path="/open" element={<Open />}/>
+      <Route path="/open/search" element={<SearchContainer />}/>
       <Route path="/open/:type" element={<ListsContainer />}/>
       <Route path="/fun" element={<Fun />}/>
       <Route path="/favorite" element={<FavoriteContainer />}/>

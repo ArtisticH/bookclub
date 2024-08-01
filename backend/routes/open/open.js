@@ -33,6 +33,10 @@ let ALADIN = false;
 let FAKER = false;
 let NAT = false;
 
+router.get("/search", (req, res) => {
+  res.json({ user: res.user });
+});
+
 router.get("/:type", async (req, res) => {
   try {
     const type = req.params.type;
@@ -64,7 +68,7 @@ async function national() {
   const title = "2024 국립중앙도서관 사서추천도서";
   const img = "/img/open/national.png";
   const total = data.channel.list.length; // 총 갯수
-  if(!NAT) {
+  if (!NAT) {
     data.channel.list.forEach((list, index) => {
       natLists[natLists.length] = {
         id: index + 1,
@@ -75,7 +79,7 @@ async function national() {
         date: `${list.item.publishYear}.${list.item.recomMonth}`,
         codeName: list.item.drCodeName,
       };
-    });  
+    });
   }
   NAT = true;
   // 12개만 보낼게
@@ -91,7 +95,7 @@ async function aladin() {
   const title = "알라딘 베스트셀러 리스트 - 소설/시/희곡";
   const img = "/img/open/aladin-list.png";
   const total = json.item.length;
-  if(!ALADIN) {
+  if (!ALADIN) {
     json.item.forEach((item, index) => {
       aladinLists[aladinLists.length] = {
         id: index + 1,
@@ -101,7 +105,7 @@ async function aladin() {
         img: item.cover,
         date: aladinDate(item.pubDate),
       };
-    });  
+    });
   }
   ALADIN = true;
   const lists = aladinLists.slice(0, 12);
@@ -116,7 +120,7 @@ async function faker() {
   const title = "다독가 페이커의 독서목록";
   const img = `/img/open/faker-list.png`;
   const total = json.data.length;
-  if(!FAKER) {
+  if (!FAKER) {
     json.data.forEach((item, index) => {
       // 페이지네이션할때 서버와 통신 없이 미리 받아논 애들을 쓸 수 있게 전부 저장
       fakerLists[fakerLists.length] = {
@@ -126,7 +130,7 @@ async function faker() {
         publisher: item.pub,
         img: item.img,
       };
-    });  
+    });
   }
   FAKER = true;
   const lists = fakerLists.slice(0, 12);
@@ -183,9 +187,9 @@ router.post("/exist", async (req, res) => {
     const FolderId = req.body.FolderId;
     const ids = JSON.parse(req.body.ids);
     const type = req.body.type;
-    const lists = match[type].filter(item => {
+    const lists = match[type].filter((item) => {
       return ids.includes(item.id);
-    })
+    });
     // 우선 폴더의 갯수를 늘리고
     await Folder.increment("count", {
       by: ids.length,
@@ -215,9 +219,9 @@ router.post("/add", async (req, res) => {
     const isPublic = req.body.isPublic === "public" ? true : false;
     const ids = JSON.parse(req.body.ids);
     const type = req.body.type;
-    const lists = match[type].filter(item => {
+    const lists = match[type].filter((item) => {
       return ids.includes(item.id);
-    })
+    });
     const folder = await Folder.create({
       title,
       MemberId,
@@ -240,14 +244,10 @@ router.post("/add", async (req, res) => {
     console.error(err);
   }
 });
-// 국립중앙도서관 소장자료조희
-router.get("/search", (req, res) => {
-  res.render("api/api-search");
-});
 // 소장 자료 검색 결과 반환
 router.post("/search", async (req, res) => {
   try {
-    const target = req.body.target;
+    const option = req.body.option;
     const kwd = req.body.kwd;
     const url = `
     https://www.nl.go.kr/NL/search/openApi/search.do?key=${
@@ -257,7 +257,7 @@ router.post("/search", async (req, res) => {
     )}&category=${encodeURIComponent(
       "도서"
     )}&pageSize=10&pageNum=1&srchTarget=${encodeURIComponent(
-      target
+      option
     )}&kwd=${encodeURIComponent(kwd)}
     `;
     const response = await fetch(url);

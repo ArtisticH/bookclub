@@ -5,13 +5,12 @@ import { produce } from "immer";
 const GET_APILISTS = "APILISTS/GET_APILISTS";
 const GET_APILISTS_SUCCESS = "APILISTS/GET_APILISTS_SUCCESS";
 const GET_APILISTS_FAILURE = "APILISTS/GET_APILISTS_FAILURE";
-const UPDATE_LISTS = "APILISTS/UPDATE_LISTS"
+const UPDATE_LISTS = "APILISTS/UPDATE_LISTS";
 
 const getApiLists = (type) => async (dispatch) => {
   dispatch({ type: GET_APILISTS });
   try {
     const res = await axios.get(`/open/${type}`);
-    console.log(res);
     const data = res.data;
     dispatch({
       type: GET_APILISTS_SUCCESS,
@@ -45,9 +44,9 @@ const apilists = handleActions(
       loading: false,
     }),
     [UPDATE_LISTS]: (state, action) =>
-    produce(state, (draft) => {
-      draft.data.lists = action.payload;
-    }),
+      produce(state, (draft) => {
+        draft.data.lists = action.payload;
+      }),
   },
   containerState
 );
@@ -97,7 +96,7 @@ function componentReducer(state, action) {
       return produce(state, (draft) => {
         draft.selected.push(action.id);
       });
-    case "REMOVE_SELECT": 
+    case "REMOVE_SELECT":
       return produce(state, (draft) => {
         const index = draft.selected.findIndex((id) => id == action.id);
         draft.selected.splice(index, 1);
@@ -106,7 +105,7 @@ function componentReducer(state, action) {
       return produce(state, (draft) => {
         draft.selected = [];
       });
-      case "FOLDERS":
+    case "FOLDERS":
       return produce(state, (draft) => {
         draft.folders = action.payload;
       });

@@ -7,7 +7,7 @@ import {
   updateLists
 } from "../../Modules/Open/Lists";
 
-const DonelistContainer = ({
+const ListsContainer = ({
   loading,
   data,
   getApiLists,
@@ -39,4 +39,4 @@ export default connect(
     getApiLists,
     updateLists
   }
-)(DonelistContainer);
+)(ListsContainer);

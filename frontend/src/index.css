@@ -70,6 +70,11 @@ a {
   width: 100%;
 }
 
+.searching_txt {
+  color: #dd2a4d;
+  font-weight: 500;
+}
+
 @media all and (min-width: 1200px) { 
   :root {
     --final-width: 330px;
