@@ -5,6 +5,8 @@ import book from './Book/Book'
 import members from './Members'
 import wishlist from './Wishlist/Wishlist'
 import list from './Wishlist/List'
+import donelist from './Wishlist/Donelist'
+import apilists from './Open/Lists'
 import favorite from './Favorite/Favorite';
 import tournament from './Favorite/Tournament';
 import ranking from './Favorite/Ranking';
@@ -16,6 +18,8 @@ const rootReducer = combineReducers({
   members,
   wishlist,
   list,
+  donelist,
+  apilists,
   favorite,
   tournament,
   ranking,

@@ -71,36 +71,9 @@ function makeStar(digit) {
   }
 }
 
-function makeTypeTitle(item, oneBlog) {
-  const typeArr = {
-    free: '#자유글',
-    book: '#독서후기',
-    date: '#모임후기',
-  };
-  const titleArr = {
-    free: item.title,
-    book: item.Book && item.Book.title,
-    date: item.Book && item.Book.meetingDate,
-  };
-  const titleOne = {
-    free: item.title,
-    book: item.Book && `[${item.Book.title}-${item.Book.author}]독서 후기`,
-    date: item.Book && `[${item.Book.meetingDate}]모임 후기`,
-  };
-  const type = typeArr[item.type];
-  let title;
-  if(oneBlog) {
-    title = titleOne[item.type];
-  } else {
-    title = titleArr[item.type];
-  }
-  return { type, title }
-}
-
 module.exports = {
   makeDate, 
   makeText, 
   makeSum,
   makeStar,
-  makeTypeTitle,
 }

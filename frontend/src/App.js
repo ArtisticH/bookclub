@@ -5,6 +5,9 @@ import BookContainer from './Containers/Book/BookContainer';
 import MembersContainer from './Containers/MembersContainer';
 import WishlistContainer from './Containers/Wishlist/WishlistContainer';
 import ListContainer from './Containers/Wishlist/ListContainer';
+import DonelistContainer from './Containers/Wishlist/DonelistContainer';
+import Open from './Components/Open/Open';
+import ListsContainer from './Containers/Open/ListsContainer';
 import TournamentContainer from './Containers/Favorite/TournamentContainer';
 import FavoriteContainer from './Containers/Favorite/FavoriteContainer';
 import RankingContainer from './Containers/Favorite/RankingContainer';
@@ -20,6 +23,9 @@ function App() {
       <Route path="/members" element={<MembersContainer />}/>
       <Route path="/wishlist/:id" element={<WishlistContainer />}/>
       <Route path="/list/:forderid/:memberid" element={<ListContainer />}/>
+      <Route path="/donelist/:memberid" element={<DonelistContainer />}/>
+      <Route path="/open" element={<Open />}/>
+      <Route path="/open/:type" element={<ListsContainer />}/>
       <Route path="/fun" element={<Fun />}/>
       <Route path="/favorite" element={<FavoriteContainer />}/>
       <Route path="/favorite/:id/:round" element={<TournamentContainer />}/>

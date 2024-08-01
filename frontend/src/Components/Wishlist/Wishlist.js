@@ -192,7 +192,7 @@ const Folder = ({ state, data, folder, dispatch }) => {
       alert("비공개 폴더입니다.");
       return;
     }
-    const url = `/list/${folder.id}/${user.id}`;
+    const url = `/list/${folder.id}/${id}`;
     navigate(url);
   }, [user, id]);
 
@@ -214,8 +214,8 @@ const Folder = ({ state, data, folder, dispatch }) => {
   );
 };
 
-const Done = ({ state, data, done, dispatch }) => {
-  const { user, id } = data;
+const Done = ({ state, data, dispatch }) => {
+  const { user, id, done } = data;
   const navigate = useNavigate();
   const Click = useCallback((e) => {
     dispatch({
@@ -230,9 +230,9 @@ const Done = ({ state, data, done, dispatch }) => {
       alert("비공개 폴더입니다.");
       return;
     }
-    const url = `/donelist/${user.id}`;
+    const url = `/donelist/${id}`;
     navigate(url);
-  }, [user, id]);
+  }, [user, id, done]);
 
   return (
     <div
@@ -270,7 +270,7 @@ const FolderMenu = ({ data, state, dispatch, ContainerDispatch }) => {
       alert("비공개 폴더입니다.");
       return;
     }
-    const url = `/list/${currentFolder.id}/${user.id}`;
+    const url = `/list/${currentFolder.id}/${id}`;
     navigate(url);
   }, [currentFolder, user, id]);
 
@@ -351,7 +351,7 @@ const FolderMenu = ({ data, state, dispatch, ContainerDispatch }) => {
 
 const DoneFolderMenu = ({ data, state, dispatch, ContainerDispatch }) => {
   const { id, user, done } = data;
-  const { position, currentFolder } = state;
+  const { position } = state;
   const { changeDonePublic } = ContainerDispatch;
   const navigate = useNavigate();
   const style = useMemo(() => {
@@ -362,14 +362,14 @@ const DoneFolderMenu = ({ data, state, dispatch, ContainerDispatch }) => {
   }, [position]);
 
   const Open = useCallback(async () => {
-    if (!currentFolder.public && user.id != id) {
+    if (!done.public && user.id != id) {
       // 비공개폴더인데 본인이 아닐때
       alert("비공개 폴더입니다.");
       return;
     }
-    const url = `/donelist/${user.id}`;
+    const url = `/donelist/${id}`;
     navigate(url);
-  }, [user, currentFolder, id]);
+  }, [user, done, id]);
 
   const Public = useCallback(async () => {
     if (!user || user.id != id) {
@@ -555,7 +555,6 @@ const Wishlist = ({ data, loading, ContainerDispatch }) => {
                     />
                   ))}
                   <Done
-                    done={done}
                     state={state}
                     data={data}
                     dispatch={dispatch}
