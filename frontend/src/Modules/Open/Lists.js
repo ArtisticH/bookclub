@@ -5,6 +5,7 @@ import { produce } from "immer";
 const GET_APILISTS = "APILISTS/GET_APILISTS";
 const GET_APILISTS_SUCCESS = "APILISTS/GET_APILISTS_SUCCESS";
 const GET_APILISTS_FAILURE = "APILISTS/GET_APILISTS_FAILURE";
+const UPDATE_LISTS = "APILISTS/UPDATE_LISTS"
 
 const getApiLists = (type) => async (dispatch) => {
   dispatch({ type: GET_APILISTS });
@@ -43,9 +44,15 @@ const apilists = handleActions(
       ...state,
       loading: false,
     }),
+    [UPDATE_LISTS]: (state, action) =>
+    produce(state, (draft) => {
+      draft.data.lists = action.payload;
+    }),
   },
   containerState
 );
+
+const updateLists = (lists) => ({ type: UPDATE_LISTS, payload: lists });
 
 const componentState = {
   last: null,
@@ -55,6 +62,7 @@ const componentState = {
     move: false,
     add: false,
   },
+  folders: [],
 };
 
 function componentReducer(state, action) {
@@ -75,20 +83,21 @@ function componentReducer(state, action) {
         draft.modal.move = false;
       });
     case "LAST":
-      const count = action.count;
-      const last = count % 15 === 0 ? count / 15 : Math.floor(count / 15) + 1;
+      const count = action.total;
+      const last = count % 12 === 0 ? count / 12 : Math.floor(count / 12) + 1;
       return produce(state, (draft) => {
         draft.last = last;
       });
     case "PAGE": // 현재 페이지
       return produce(state, (draft) => {
         draft.page = action.payload;
+        draft.selected = [];
       });
     case "ADD_SELECT": // 선택한 애들 모으기
       return produce(state, (draft) => {
         draft.selected.push(action.id);
       });
-    case "REMOVE_SELECT": // 선택한 애들 모으기
+    case "REMOVE_SELECT": 
       return produce(state, (draft) => {
         const index = draft.selected.findIndex((id) => id == action.id);
         draft.selected.splice(index, 1);
@@ -97,9 +106,13 @@ function componentReducer(state, action) {
       return produce(state, (draft) => {
         draft.selected = [];
       });
+      case "FOLDERS":
+      return produce(state, (draft) => {
+        draft.folders = action.payload;
+      });
   }
 }
 
-export { getApiLists, componentState, componentReducer };
+export { getApiLists, updateLists, componentState, componentReducer };
 
 export default apilists;

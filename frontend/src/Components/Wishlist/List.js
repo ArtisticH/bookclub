@@ -410,38 +410,42 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
       alert('존재하지 않는 페이지입니다.');
       return;
     }
+    dispatch({ type: "RESET_SELECTED" });
     const res = await axios.get(`/list/page/${FolderId}/${member.id}/${page}`);
     const lists = res.data.lists;
     updateLists(lists);
-  }, [page]);
+  }, [page, last]);
 
   const Last = useCallback(async () => {
     if(page == last) {
       alert('마지막 페이지입니다.');
       return;
     }
+    dispatch({ type: "RESET_SELECTED" });
     const res = await axios.get(`/list/page/${FolderId}/${member.id}/${last}`);
     const lists = res.data.lists;
     updateLists(lists);
     dispatch({ type: "PAGE", payload: last });
-  }, [last]);
+  }, [last, page]);
 
   const First = useCallback(async () => {
     if(page == 1) {
       alert('첫 페이지입니다.');
       return;
     }
+    dispatch({ type: "RESET_SELECTED" });
     const res = await axios.get(`/list/page/${FolderId}/${member.id}/${1}`);
     const lists = res.data.lists;
     updateLists(lists);
     dispatch({ type: "PAGE", payload: 1 });
-  }, []);
+  }, [page]);
 
   const Next = useCallback(async () => {
     if(page == last) {
       alert('마지막 페이지입니다.');
       return;
     }
+    dispatch({ type: "RESET_SELECTED" });
     const target = page != last ? page + 1 : last;
     const res = await axios.get(
       `/list/page/${FolderId}/${member.id}/${target}`
@@ -456,6 +460,7 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
       alert('첫 페이지입니다.');
       return;
     }
+    dispatch({ type: "RESET_SELECTED" });
     const target = page != 1 ? page - 1 : 1;
     const res = await axios.get(
       `/list/page/${FolderId}/${member.id}/${target}`

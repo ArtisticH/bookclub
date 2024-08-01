@@ -115,6 +115,7 @@ function componentReducer(state, action) {
     case "PAGE": // 현재 페이지
       return produce(state, (draft) => {
         draft.page = action.payload;
+        draft.selected = [];
       });
     case "ADD_SELECT": // 선택한 애들 모으기
       return produce(state, (draft) => {

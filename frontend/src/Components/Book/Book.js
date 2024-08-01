@@ -363,7 +363,7 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
     const res = await axios.get(`/books/page/${BookId}/${page}`);
     const reviews = res.data.reviews;
     updateReviews(reviews);
-  }, [page]);
+  }, [page, last]);
 
   const Last = useCallback(async () => {
     if(page == last) {
@@ -374,7 +374,7 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
     const reviews = res.data.reviews;
     updateReviews(reviews);
     dispatch({ type: "PAGE", payload: last });
-  }, [last]);
+  }, [last, page]);
 
   const First = useCallback(async () => {
     if(page == 1) {
@@ -385,7 +385,7 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
     const reviews = res.data.reviews;
     updateReviews(reviews);
     dispatch({ type: "PAGE", payload: 1 });
-  }, []);
+  }, [page]);
 
   const Next = useCallback(async () => {
     if(page == last) {
@@ -397,7 +397,7 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
     const reviews = res.data.reviews;
     updateReviews(reviews);
     dispatch({ type: "PAGE", payload: target });
-  }, [page]);
+  }, [page, last]);
 
   const Before = useCallback(async () => {
     if(page == 1) {

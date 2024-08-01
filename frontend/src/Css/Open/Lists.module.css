@@ -175,13 +175,6 @@
   position: fixed;
   border: 1px solid black;
   background-color: white;
-}
-
-.folder {
-  width: 400px;
-}
-
-.add {
   width: 300px;
 }
 
@@ -236,11 +229,10 @@
   padding: 20px;
 }
 
-.form-add {
+.add-btn-flex {
   display: flex;
   align-items: center;
-  justify-content: end;
-  padding: 15px;
+  justify-content: flex-end;
 }
 
 .add-btn {
@@ -251,6 +243,7 @@
   font-family: var(--font-korean);
   font-size: 0.9rem;
   letter-spacing: -0.5px;
+  line-height: 1;
   font-weight: 200;
   height: 22px;
   padding: 0 10px;
@@ -286,8 +279,13 @@
   line-height: 1;
 }
 
+.radio {
+  margin-right: 5px;
+}
+
 .submit {
   font-family: var(--font-korean);
+  line-height: 1;
   font-size: 0.8rem;
   letter-spacing: -0.5px;
   font-weight: 300;
@@ -302,15 +300,32 @@
   cursor: pointer;
 }
 
+.form-add {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: end;
+  padding: 15px;
+}
+
 .radio-box {
   line-height: 1;
   display: flex;
   align-items: center;
+  width: 100%;
   font-family: var(--font-korean);
   font-size: 0.8rem;
   letter-spacing: -0.5px;
   font-weight: 200;
   margin-bottom: 10px;
+}
+
+.add-label {
+  margin-right: 10px;
+}
+
+.add-radio {
+  margin-right: 5px;
 }
 
 .add-input,
