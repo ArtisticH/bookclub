@@ -23,7 +23,7 @@ const wishlistRouter = require('./routes/wishlist/wishlist');
 const listRouter = require('./routes/wishlist/list');
 const donelistRouter = require('./routes/wishlist/donelist');
 const favoriteRouter = require('./routes/favorite/favorite');
-const quotesRouter = require('./routes/quotes/quotes');
+const decoRouter = require('./routes/deco/deco');
 const openRouter = require('./routes/open/open');
 // 시퀄라이즈객체
 const { sequelize } = require('./models'); 
@@ -75,7 +75,7 @@ app.use('/wishlist', wishlistRouter);
 app.use('/list', listRouter);
 app.use('/donelist', donelistRouter);
 app.use('/favorite', favoriteRouter);
-app.use('/quotes', quotesRouter);
+app.use('/deco', decoRouter);
 app.use('/open', openRouter);
 
 app.use((req, res, next) => {

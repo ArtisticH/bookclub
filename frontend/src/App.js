@@ -12,7 +12,7 @@ import SearchContainer from './Containers/Open/SearchContainer';
 import TournamentContainer from './Containers/Favorite/TournamentContainer';
 import FavoriteContainer from './Containers/Favorite/FavoriteContainer';
 import RankingContainer from './Containers/Favorite/RankingContainer';
-import Quotes from './Components/Quotes';
+import Decoration from './Components/Deco';
 import Fun from './Components/Fun';
 
 function App() {
@@ -32,7 +32,7 @@ function App() {
       <Route path="/favorite" element={<FavoriteContainer />}/>
       <Route path="/favorite/:id/:round" element={<TournamentContainer />}/>
       <Route path="/favorite/ranking/:id" element={<RankingContainer />}/>
-      <Route path="/quotes" element={<Quotes />}/>
+      <Route path="/deco" element={<Decoration />}/>
     </Routes>
   );
 }

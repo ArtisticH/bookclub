@@ -5,10 +5,10 @@ import React, {
   useEffect,
   useRef,
 } from "react";
-import styles from "../Css/Quotes.module.css";
+import styles from "../Css/Deco.module.css";
 import classNames from "classnames/bind";
 import { Link } from "react-router-dom";
-import { componentState, componentReducer } from "../Modules/Open/Quotes";
+import { componentState, componentReducer } from "../Modules/Open/Deco";
 import axios from "axios";
 import domtoimage from "dom-to-image";
 import { saveAs } from "file-saver";
@@ -83,7 +83,7 @@ const Options = ({ dispatch, state }) => {
     const file = target.files[0];
     const formData = new FormData();
     formData.append("image", file);
-    const res = await axios.post("/quotes/preview", formData);
+    const res = await axios.post("/deco/preview", formData);
     const { url } = res.data;
     dispatch({ type: "IMG", url });
   }, []);
@@ -375,7 +375,7 @@ const Deco = ({ dispatch }) => {
   );
 };
 
-const Quotes = () => {
+const Decoration = () => {
   const [state, dispatch] = useReducer(componentReducer, componentState);
   const { modal } = state;
   return (
@@ -401,4 +401,4 @@ const Quotes = () => {
   );
 };
 
-export default Quotes;
+export default Decoration;

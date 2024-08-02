@@ -46,11 +46,11 @@ const Right = () => {
             이상형 월드컵 즐기기
           </div>
         </Link>
-        <Link to="/quotes" className={cx("project")}>
+        <Link to="/deco" className={cx("project")}>
           <div className={cx("project-title")}>
             02
             <br />
-            Quotes
+            Decorate Img
           </div>
           <div className={cx("project-exp")}>
             맘에 드는 구절을
