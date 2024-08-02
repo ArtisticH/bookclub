@@ -10,14 +10,15 @@ import classNames from "classnames/bind";
 import { Link } from "react-router-dom";
 import { componentState, componentReducer } from "../Modules/Open/Quotes";
 import axios from "axios";
-import mergeImages from 'merge-images';
+import domtoimage from "dom-to-image";
+import { saveAs } from "file-saver";
 
 const cx = classNames.bind(styles);
 
 const Preview = ({ state, dispatch }) => {
-  const { img, quotes, from, deco, modal } = state;
+  const { img, quotes, from, deco, canvas } = state;
   const Canvas = useRef(null);
-  const Img = useRef(null);
+  const PreviewElem = useRef(null);
 
   const style = useMemo(() => {
     return {
@@ -33,17 +34,37 @@ const Preview = ({ state, dispatch }) => {
       type: "CANVAS",
       ctx: Canvas.current.getContext("2d"),
       canvas: Canvas.current,
-      imgElem: Img.current,
+      preview: PreviewElem.current,
     });
-  }, [Img, Canvas]);
+  }, [Canvas]);
+
+  const Resize = (e) => {
+    if (document.documentElement.clientWidth >= 1300) {
+      dispatch({ type: "OVER_1300" });
+    } else if (
+      document.documentElement.clientWidth >= 1100 &&
+      document.documentElement.clientWidth < 1300
+    ) {
+      dispatch({ type: "1300_1100" });
+    } else if (document.documentElement.clientWidth < 1100) {
+      dispatch({ type: "UNDER_1100" });
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", Resize);
+    return () => {
+      window.removeEventListener("resize", Resize);
+    };
+  });
 
   return (
-    <div className={cx("preview")}>
-      <img className={cx("preview-img", { none: img === "" })} src={img} ref={Img}/>
+    <div className={cx("preview")} ref={PreviewElem}>
+      <img className={cx("preview-img", { none: img === "" })} src={img} />
       <canvas
         className={cx("canvas")}
-        width="400"
-        height="400"
+        width={canvas.width}
+        height={canvas.height}
         ref={Canvas}
       ></canvas>
       <div className={cx("preview-text")} style={style}>
@@ -55,9 +76,7 @@ const Preview = ({ state, dispatch }) => {
 };
 
 const Options = ({ dispatch, state }) => {
-  const { canvas, imgElem, img } = state;
-
-  const This = useRef(null);
+  const { preview, img } = state;
 
   const Change = useCallback(async (e) => {
     const target = e.currentTarget;
@@ -86,40 +105,13 @@ const Options = ({ dispatch, state }) => {
   }, []);
 
   const Download = useCallback(async () => {
-    // const link = document.createElement('a');
-    // link.href = canvas.elem.toDataURL('image/jpeg');
-    // link.download = 'merged_image.jpg';
-    // link.click();
-    // console.log(canvas.elem.toDataURL('image/jpeg'))
-    const blob = await new Promise((resolve, reject) => {
-      canvas.elem.toBlob((blob) => {
-        if (!blob) {
-          console.error('Blob 생성 실패');
-          reject('Blob 생성 실패');
-        } else {
-          resolve(blob);
-        }
-      }, 'image/png');
-    });
-    // Blob 객체를 파일 형태로 변환
-    const file = new File([blob], 'image.png', { type: 'image/png' });
-    // FormData에 파일 추가
-    const formData = new FormData();
-    formData.append('image', file);
-    const { data: { url } } = await axios.post('/quotes/preview', formData);
-    // console.log(url);
-    // const link = document.createElement('a');
-    // link.href = url
-    // link.download = 'merged_image.jpg';
-    // link.click();
-
-
-    mergeImages([img, url])
-  .then(b64 => This.current.src = b64);
-  //   console.log(canvas.elem.toDataURL('image/jpeg'), imgElem, img)
-
-  }, [imgElem, canvas, img]);
-
+    if (!img) {
+      alert("이미지는 필수로 등록해야 합니다.");
+      return;
+    }
+    const saveBlob = await domtoimage.toBlob(preview);
+    saveAs(saveBlob, "Decorated.png");
+  }, [preview, img]);
 
   return (
     <form className={cx("options")}>
@@ -149,7 +141,6 @@ const Options = ({ dispatch, state }) => {
       <div className={cx("option", "download")} onClick={Download}>
         DOWNLOAD
       </div>
-      <img ref={This} style={{border: '2px solid red', width: '400px', height: '400px', display: 'block'}}/>
     </form>
   );
 };
@@ -199,27 +190,25 @@ const TextModal = ({ dispatch }) => {
 
 const Canvas = ({ dispatch, state }) => {
   const { canvas } = state;
-  let painting = false;
-  let color = "black";
-  let line = 5;
   const Cancel = useCallback(() => {
     dispatch({ type: "CANVAS_CANCEL" });
   }, []);
 
   const startPosition = useCallback(
     (e) => {
-      painting = true;
-      canvas.ctx.lineWidth = line;
+      dispatch({ type: "CANVAS_TRUE" });
+      canvas.ctx.lineWidth = 5;
       canvas.ctx.lineCap = "round"; // 선끝의 모양 butt, round, square
-      canvas.ctx.strokeStyle = color;
+      canvas.ctx.strokeStyle = canvas.color;
       draw(e);
     },
-    [canvas, painting, color, line]
+    [canvas]
   );
 
   const draw = useCallback(
     (e) => {
-      if (!painting) return;
+      if (!canvas.painting) return;
+      console.log("드로우");
       const rect = canvas.elem.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
@@ -228,12 +217,12 @@ const Canvas = ({ dispatch, state }) => {
       canvas.ctx.beginPath(); // 새로운 경로 시작, 이전 경로 초기화, 새로운 경로 시작,
       canvas.ctx.moveTo(x, y); // beginPath이 새로운 경로를 생성
     },
-    [canvas, painting]
+    [canvas]
   );
 
   const endPosition = useCallback(
     (e) => {
-      painting = false;
+      dispatch({ type: "CANVAS_FALSE" });
       canvas.ctx.beginPath();
     },
     [canvas]
@@ -252,17 +241,15 @@ const Canvas = ({ dispatch, state }) => {
       canvas.elem.removeEventListener("pointerout", endPosition);
       canvas.elem.removeEventListener("pointermove", draw);
     };
-  }, []);
+  }, [canvas]);
 
   const Color = useCallback((tool) => {
-    color = tool;
+    dispatch({ type: "CANVAS_COLOR", color: tool });
   }, []);
 
   const Reset = useCallback(() => {
-    color = "black";
-    line = 5;
-    canvas.ctx.clearRect(0, 0, canvas.elem.width, canvas.elem.height);
-  }, [canvas]);
+    dispatch({ type: "CANVAS_RESET" });
+  }, []);
 
   return (
     <div className={cx("modal")}>
@@ -400,11 +387,15 @@ const Quotes = () => {
         </Link>
       </div>
       <div className={cx("main")}>
-        <Preview state={state} dispatch={dispatch} />
-        <Options state={state} dispatch={dispatch} />
-        {modal.text && <TextModal dispatch={dispatch} />}
-        {modal.canvas && <Canvas state={state} dispatch={dispatch} />}
-        {modal.deco && <Deco dispatch={dispatch} />}
+        <div>
+          <Preview state={state} dispatch={dispatch} />
+          <Options state={state} dispatch={dispatch} />
+        </div>
+        <div>
+          {modal.text && <TextModal dispatch={dispatch} />}
+          {modal.canvas && <Canvas state={state} dispatch={dispatch} />}
+          {modal.deco && <Deco dispatch={dispatch} />}
+        </div>
       </div>
     </div>
   );
