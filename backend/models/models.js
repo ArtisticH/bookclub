@@ -37,7 +37,6 @@ class Book extends Sequelize.Model {
 
   static associate(db) {
     db.Book.hasMany(db.Review, { foreignKey: 'BookId', sourceKey: 'id'}); 
-    db.Book.hasMany(db.Blog, { foreignKey: 'BookId', sourceKey: 'id'}); 
   }
 }
 
@@ -89,7 +88,6 @@ class Member extends Sequelize.Model {
     db.Member.hasMany(db.Folder, { foreignKey: 'MemberId', sourceKey: 'id'}); 
     db.Member.hasMany(db.List, { foreignKey: 'MemberId', sourceKey: 'id'}); 
     db.Member.hasMany(db.DoneList, { foreignKey: 'MemberId', sourceKey: 'id'}); 
-    db.Member.hasMany(db.Blog, { foreignKey: 'MemberId', sourceKey: 'id'}); 
   }
 }
 
@@ -160,41 +158,6 @@ class Review extends Sequelize.Model {
   }
 }
 
-class Blog extends Sequelize.Model {
-  static init(sequelize) {
-    return super.init({
-      type: {
-        type: Sequelize.STRING(15),
-        allowNull: false,
-      },
-      title: {
-        type: Sequelize.STRING(100),
-        allowNull: false,
-      },
-      text: {
-        type: Sequelize.TEXT,
-        allowNull: false,
-      },
-      thumbnail: {
-        type: Sequelize.STRING(100),
-        allowNull: false,
-      },
-    }, {
-      sequelize,
-      timestamps: true,
-      underscored: false,
-      modelName: 'Blog',
-      tableName: 'blogs',
-      paranoid: false,
-      charset: 'utf8mb4',
-      collate: 'utf8mb4_general_ci',
-    })
-  }
-  static associate(db) {
-    db.Blog.belongsTo(db.Member, { foreignKey: 'MemberId', targetKey: 'id'}); 
-    db.Blog.belongsTo(db.Book, { foreignKey: 'BookId', targetKey: 'id'}); 
-  }
-}
 
 class Folder extends Sequelize.Model {
   static init(sequelize) {
@@ -489,7 +452,6 @@ module.exports = {
   Member,
   Attend,
   Review,
-  Blog,
   Folder,
   List,
   DoneFolder,

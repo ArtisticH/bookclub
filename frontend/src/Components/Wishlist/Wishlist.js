@@ -167,7 +167,7 @@ const Change = ({ state, dispatch, ContainerDispatch }) => {
 
 const Empty = () => {
   return (
-    <div className="empty">오른쪽 마우스를 클릭해 폴더를 추가해보세요.</div>
+    <div className={cx('empty')}>오른쪽 마우스를 클릭해 폴더를 추가해보세요.</div>
   );
 };
 

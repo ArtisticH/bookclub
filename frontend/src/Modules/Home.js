@@ -7,34 +7,44 @@ const LOGIN = "Home/LOGIN";
 const NOT_LOGIN = "Home/NOT_LOGIN";
 const GET_HOME_FAILURE = "Home/GET_HOME_FAILURE";
 
-const getHome = () => async (dispatch) => {
+const getHome = (auth, AuthUser, AuthMembers) => async (dispatch) => {
   dispatch({ type: GET_HOME });
-  try {
-    const res = await axios.get('/home');
-    const user = res.data.user;
-    const members = res.data.members;
-    if(user) { // 로그인 상태
-      dispatch({
-        type: LOGIN,
-        payload: {
-          user,
-          members
-        }, 
-      });  
-    } else { // 로그인이 안되어있는 상태
-      dispatch({
-        type: NOT_LOGIN,
-        payload: {
-          user,
-          members
-        },
-      });  
-    }
-  } catch (e) {
+  if(auth) {
     dispatch({
-      type: GET_HOME_FAILURE,
-    });
-    throw e;
+      type: LOGIN,
+      payload: {
+        user: AuthUser,
+        members: AuthMembers
+      }, 
+    });  
+  } else {
+    try {
+      const res = await axios.get(`/home`);
+      const user = res.data.user;
+      const members = res.data.members;
+      if(user) { // 로그인 상태
+        dispatch({
+          type: LOGIN,
+          payload: {
+            user,
+            members
+          }, 
+        });  
+      } else { // 로그인이 안되어있는 상태
+        dispatch({
+          type: NOT_LOGIN,
+          payload: {
+            user,
+            members
+          },
+        });  
+      }
+    } catch (e) {
+      dispatch({
+        type: GET_HOME_FAILURE,
+      });
+      throw e;
+    }  
   }
 };
 // 하위 컴포넌트에서 상태를 바꿀 수 있는 방법

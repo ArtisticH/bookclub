@@ -448,7 +448,7 @@ const Form = ({
 }) => {
   const { book, user } = data;
   const { star, eidtClicked, editReview } = state;
-  const { updateStar, addTotalReview, updateReviews, editReviewDispatch } = ContainerDispatch;
+  const { updateStar, addReview, updateReviews, editReviewDispatch } = ContainerDispatch;
   const BookId = book.id;
   const Stars = useRef(null);
   const Length = useRef(null);
@@ -540,7 +540,7 @@ const Form = ({
       Cancel();
       // 아래 내용은 서버에서 온 데이터를 다루는거라 따로 컨테이너에서 받아야 한다.
       updateStar(starArr, starNum); // 별 상태 업데이트
-      addTotalReview(); // 리뷰 하나 추가
+      addReview(); // 리뷰 하나 추가
       // 어차피 등록은 다 1페이지로 와
       updateReviews(reviews); // 리뷰 최신거 포함 5개로 업데이트
     },

@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useReducer, useRef } from "react";
 import styles from "../Css/Home.module.css";
 import classNames from "classnames/bind";
 import { Link, useNavigate } from "react-router-dom";
@@ -67,10 +61,17 @@ const LogInForm = ({ formLogin, dispatch, LogIn, members }) => {
   const CancelLogIn = useCallback(() => {
     dispatch({ type: "FORM_CANCEL_LOGIN" });
   }, []);
+  const Kakao = useCallback(() => {
+    window.location.href = 'http://localhost:3001/auth/kakao'; 
+  }, [])
+  const Naver = useCallback(() => {
+    window.location.href = 'http://localhost:3001/auth/naver'; 
+  }, [])
+
   // 로그인을 진행할때
   const Submit = useCallback(async (e) => {
     e.preventDefault();
-    console.log('로그인')
+    console.log("로그인");
     const email = e.target.email.value;
     const password = e.target.password.value;
     try {
@@ -80,7 +81,8 @@ const LogInForm = ({ formLogin, dispatch, LogIn, members }) => {
       });
       CancelLogIn(); // 창을 없애고
       const success = res.data.success;
-      if (success) { // 성공했다면 루트 리듀서에 저장한 상태 변경
+      if (success) {
+        // 성공했다면 루트 리듀서에 저장한 상태 변경
         // 멤버들도 보내야함, 이제 user 상태에서 진짜 유저 데이터 정보를 쓸 수 있음.
         LogIn(res.data.user, members);
         alert("로그인 완료!");
@@ -123,12 +125,12 @@ const LogInForm = ({ formLogin, dispatch, LogIn, members }) => {
             value="LOG IN"
           />
         </form>
-        <Link to="/auth/kakao" className={cx("kakao", "common")}>
-          KAKAO
-        </Link>
-        <Link to="/auth/naver" className={cx("naver", "common")}>
-          NAVER
-        </Link>
+        <div onClick={Kakao} className={cx("kakao", "common")}>
+        KAKAO
+        </div>
+        <div onClick={Naver} className={cx("naver", "common")}>
+        NAVER
+        </div>
       </div>
     </div>
   );
@@ -221,7 +223,7 @@ const TopRight = ({ index, dispatch }) => {
     document.documentElement.style.setProperty("--distance", distance + "px");
   }, []);
   // wishlist타이틀이나 화살표 선택시 라우트 이동이 아니라 멤버 선택 창을 보여준다.
-  // 그러면 <Home>에서 wishlist값의 변화로 <Wishlist>가 보여진다. 
+  // 그러면 <Home>에서 wishlist값의 변화로 <Wishlist>가 보여진다.
   const ClickWishlist = useCallback(() => {
     dispatch({ type: "SHOW_WISHLIST" });
   }, []);
@@ -303,6 +305,40 @@ const BotRight = () => {
 };
 
 const Card = ({ user, LogOut, members }) => {
+  let shiftX;
+  let shiftY;
+  const This = useRef(null);
+
+  useEffect(() => {
+    This.current.addEventListener("pointerdown", dragDrop);
+  });
+
+  const dragDrop = useCallback((e) => {
+    shiftX = e.clientX - This.current.getBoundingClientRect().left;
+    shiftY = e.clientY - This.current.getBoundingClientRect().top;
+    This.current.style.zIndex = 1000;
+    moveat(e.clientX, e.clientY);
+    document.addEventListener("pointermove", pointermove);
+    This.current.addEventListener("pointerup", pointerup);
+    This.current.addEventListener("dragstart", (e) => {
+      e.preventDefault();
+    });
+  }, []);
+
+  const moveat = useCallback((clientX, clientY) => {
+    This.current.style.left = clientX - shiftX + "px";
+    This.current.style.top = clientY - shiftY + "px";
+  }, []);
+
+  const pointermove = useCallback((e) => {
+    moveat(e.clientX, e.clientY);
+  }, []);
+
+  const pointerup = useCallback(() => {
+    document.removeEventListener("pointermove", pointermove);
+    This.current.removeEventListener("pointerup", pointerup);
+  }, []);
+
   const ClickLogOut = useCallback(async () => {
     const res = await axios.get("/auth/logout");
     const success = res.data.success;
@@ -314,27 +350,28 @@ const Card = ({ user, LogOut, members }) => {
 
   return (
     <>
-      {user && user.id && ( // 로그인을 해서 유저 값이 있는 경우에만
-        <div className={cx("card")}>
-          <Link className={cx("nick")} to={`/members?member=${user.id}`}>
-            {user.nick}
-          </Link>
-          <div className={cx("user-wishlist")}>
-            <div className={cx("user-wishlist-exp")}>CHECK YOUR WISHLIST</div>
-            <Link
-              to={`/wishlist/${user.id}`}
-              className={cx("user-wishlist-title")}
-            >
-              WISHLIST
+      {user &&
+        user.id && ( // 로그인을 해서 유저 값이 있는 경우에만
+          <div className={cx("card")} ref={This}>
+            <Link className={cx("nick")} to={`/members?member=${user.id}`}>
+              {user.nick}
             </Link>
-          </div>
-          <div className={cx("logout")}>
-            <div onClick={ClickLogOut} className={cx("logout-link")}>
-              LOGOUT
+            <div className={cx("user-wishlist")}>
+              <div className={cx("user-wishlist-exp")}>CHECK YOUR WISHLIST</div>
+              <Link
+                to={`/wishlist/${user.id}`}
+                className={cx("user-wishlist-title")}
+              >
+                WISHLIST
+              </Link>
+            </div>
+            <div className={cx("logout")}>
+              <div onClick={ClickLogOut} className={cx("logout-link")}>
+                LOGOUT
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
     </>
   );
 };
@@ -363,7 +400,7 @@ const Wishlist = ({ members, dispatch }) => {
       </div>
       <form className={cx("wish-form")} onSubmit={Submit}>
         <div className={cx("wish-grid")}>
-          {members.map((member) => (
+          {members && members.map((member) => (
             <Member key={member.id} member={member} />
           ))}
         </div>
@@ -403,7 +440,7 @@ const Home = ({ user, loading, login, members, LogIn, LogOut }) => {
 
   const scrollHandler = (e) => {
     // 현재 스크롤 위치에 따라 인덱스가 정해지고
-    // 그 인덱스에 따라 배경이나 타이틀 등이 바뀐다. 
+    // 그 인덱스에 따라 배경이나 타이틀 등이 바뀐다.
     if (window.pageYOffset >= start && window.pageYOffset < end) {
       dispatch({
         type: "INDEX",
@@ -417,19 +454,19 @@ const Home = ({ user, loading, login, members, LogIn, LogOut }) => {
     const offsetTop = document.body.offsetTop;
     const offsetHeight = document.body.offsetHeight;
     const browserHeight = document.documentElement.clientHeight;
-    // 범위 즉 시작과 끝을 정한다. 
+    // 범위 즉 시작과 끝을 정한다.
     dispatch({ type: "SET_RANGE", offsetTop, offsetHeight, browserHeight });
   }, []);
 
   useEffect(() => {
-    // 시작과 끝이 정해지면 구간을 정한다. 
-    if(start && end) {
+    // 시작과 끝이 정해지면 구간을 정한다.
+    if (start && end) {
       dispatch({ type: "SET_STEP" });
     }
   }, [start, end]);
 
   useEffect(() => {
-    // 스텝이 정해지면 이벤트를 등록한다. 
+    // 스텝이 정해지면 이벤트를 등록한다.
     if (step) {
       window.addEventListener("scroll", scrollHandler);
     }
@@ -467,7 +504,7 @@ const Home = ({ user, loading, login, members, LogIn, LogOut }) => {
             </div>
           </div>
           {/* 로그인 한 경우에만 노출 */}
-          {login && <Card user={user} LogOut={LogOut} members={members}/>}
+          {login && <Card user={user} LogOut={LogOut} members={members} />}
           {wishlist && <Wishlist members={members} dispatch={dispatch} />}
         </>
       )}

@@ -77,7 +77,7 @@ const Btns = ({ state }) => {
       <Link to="/open" className={cx("btn", "api")}>
         OPEN API
       </Link>
-      <Link to="/quotes" className={cx("btn", "quotes")}>
+      <Link to="/deco" className={cx("btn", "quotes")}>
         Quotes
       </Link>
       <div

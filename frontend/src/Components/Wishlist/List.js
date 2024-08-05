@@ -390,8 +390,8 @@ const Book = ({ state, list, dispatch }) => {
       <div className={cx("img-box", { clicked: selected.includes(list.id) })}>
         <img className="img" src={list.img} alt="" />
       </div>
-      <div className={cx("list-title")}>{list.title}</div>
-      <div className={cx("list-author")}>{list.author}</div>
+      <div className={cx("list-title")} dangerouslySetInnerHTML={{ __html: list.title }}></div>
+      <div className={cx("list-author")} dangerouslySetInnerHTML={{ __html: list.author }}></div>
     </div>
   );
 };
@@ -504,6 +504,7 @@ const List = ({ loading, data, ContainerDispatch }) => {
   const { modal } = state;
 
   useEffect(() => {
+    document.body.style.height = '100vh';
     if (data) {
       const { count } = data;
       // 총리뷰개수를 바탕으로 마지막 페이지를 계산

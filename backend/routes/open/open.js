@@ -220,7 +220,7 @@ router.post("/search/exist", async (req, res) => {
     const list = JSON.parse(req.body.list);
     // 우선 폴더의 갯수를 늘리고
     await Folder.increment("count", {
-      by: ids.length,
+      by: list.length,
       where: { id: FolderId },
     });
     await List.create({

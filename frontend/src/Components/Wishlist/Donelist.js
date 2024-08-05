@@ -2,8 +2,6 @@ import React, {
   useCallback,
   useReducer,
   useEffect,
-  useState,
-  useRef,
 } from "react";
 import styles from "../../Css/Wishlist/Donelist.module.css";
 import classNames from "classnames/bind";

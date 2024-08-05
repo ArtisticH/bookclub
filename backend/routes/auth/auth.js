@@ -2,6 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const bcrypt = require('bcryptjs');
 const { Member } = require('../../models/models');
+const kakaoStrategy = require('../../passport/kakaoStrategy');
 
 const router = express.Router();
 
@@ -59,15 +60,28 @@ router.get('/logout', (req, res) => {
 router.get('/kakao',  passport.authenticate('kakao'));
 router.get('/kakao/callback', passport.authenticate('kakao', {
   failureRedirect: '/',
-}), (req, res) => {
-  res.redirect('/');
+}), async (req, res) => {
+  const members = await Member.findAll({
+    where: { type: 'MEMBER' },
+    attributes: ['id', 'nick'],
+  });
+  const user = encodeURIComponent(JSON.stringify(req.user));
+  const membersData = encodeURIComponent(JSON.stringify(members));
+  res.redirect(`http://localhost:3000/?auth=kakao&user=${user}&members=${membersData}`);
 });
 
 router.get('/naver',  passport.authenticate('naver', { authType: 'reprompt' }));
 router.get('/naver/callback', passport.authenticate('naver', {
   failureRedirect: '/',
-}), (req, res) => {
-  res.redirect('/');
+}), async (req, res) => {
+  const members = await Member.findAll({
+    where: { type: 'MEMBER' },
+    attributes: ['id', 'nick'],
+  });
+  const user = encodeURIComponent(JSON.stringify(req.user));
+  const membersData = encodeURIComponent(JSON.stringify(members));
+  res.redirect(`http://localhost:3000/?auth=naver&user=${user}&members=${membersData}`);
+
 });
 
 module.exports = router;

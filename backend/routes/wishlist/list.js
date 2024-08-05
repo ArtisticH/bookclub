@@ -9,7 +9,6 @@ router.use((req, res, next) => {
   res.user = req.user;
   next();
 });
-// 처음에 내려보낼때 그냥 폴더인지 아니면 읽은 것들인지
 router.get('/:folderid/:memberid', async (req, res) => {
   try {
     const MemberId = req.params.memberid;
@@ -141,7 +140,7 @@ router.post('/delete', async(req, res) => {
     const FolderId = req.body.FolderId;
     const MemberId = req.body.MemberId;
     const page = req.body.page; 
-    const offset = 5 * (page - 1);
+    const offset = 15 * (page - 1);
     const ids = JSON.parse(req.body.id);
     // 삭제하고
     await List.destroy({
@@ -188,7 +187,7 @@ router.post('/move', async(req, res) => {
     const FolderId = req.body.FolderId;
     const targetId = req.body.targetId;
     const page = req.body.page;
-    const offset = 5 * (page - 1);
+    const offset = 15 * (page - 1);
     const ids = JSON.parse(req.body.id);
     // 먼저 이동할 아이들을 혹시 몰라 다시 한번 데이터베이스에서 가져오고
     let items = await List.findAll({
@@ -268,7 +267,7 @@ router.post('/read', async (req, res) => {
     const FolderId = req.body.FolderId;
     const MemberId = req.body.MemberId;
     const page = req.body.page;
-    const offset = 5 * (page - 1);
+    const offset = 15 * (page - 1);
     // List에서 DoneList로 옮기기
     let items = await List.findAll({
       include: [{
@@ -328,7 +327,7 @@ router.post('/read', async (req, res) => {
       offset,
       attributes: ['id', 'title', 'author', 'img'],
     });
-    const lists = items.map(item => {
+    const newLists = items.map(item => {
       return {
         id: item.id,
         img: item.img,
@@ -336,7 +335,7 @@ router.post('/read', async (req, res) => {
         author: item.author,
       }
     });
-    res.json({ lists });  
+    res.json({ newLists });  
   } catch(err) {
     console.error(err);
   }

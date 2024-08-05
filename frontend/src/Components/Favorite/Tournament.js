@@ -1,19 +1,25 @@
-import React, {
-  useCallback,
-  useEffect,
-  useReducer,
-  useRef,
-} from "react";
-import styles from "../../Css/Favorite/Tournament.module.css"
+import React, { useCallback, useEffect, useReducer, useRef } from "react";
+import styles from "../../Css/Favorite/Tournament.module.css";
 import classNames from "classnames/bind";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import domtoimage from "dom-to-image";
+import { saveAs } from "file-saver";
 import { tournamentState, reducer } from "../../Modules/Favorite/Tournament";
 
 const cx = classNames.bind(styles);
 
 const Final = ({ id, state }) => {
-  const { choosen, info: { model }, original } = state;
+  const {
+    choosen,
+    info: { model },
+    original,
+  } = state;
+  const This = useRef(null);
+  const Download = useCallback(async () => {
+    const saveBlob = await domtoimage.toBlob(This.current);
+    saveAs(saveBlob, `${original[choosen].main}.jpeg`);
+  }, []);
   return (
     <div className={cx("modal")}>
       <div className={cx("nav")}>
@@ -34,6 +40,8 @@ const Final = ({ id, state }) => {
         </div>
         <div className={cx("final-main")}>
           <img
+            ref={This}
+            onClick={Download}
             className={cx("img")}
             src={`/img/${model}/${original[choosen].main}.jpeg`}
             alt="final"
@@ -41,13 +49,9 @@ const Final = ({ id, state }) => {
         </div>
       </div>
       <div className={cx("options")}>
-        <a
-          className={cx("option")}
-          href={`/img/${model}/${original[choosen].main}.jpeg`}
-          download={`${original[choosen].main}.jpeg`}
-        >
+        <div onClick={Download} className={cx("option")}>
           Img Download
-        </a>
+        </div>
         <Link to={`/favorite/ranking/${id}`} className={cx("option")}>
           See Ranking
         </Link>
@@ -300,11 +304,11 @@ const Battle = ({ state, dispatch }) => {
         original: JSON.stringify(state.original),
         modelName: state.info.model,
       });
-    }
-    if(state.finalClicked) {
+    };
+    if (state.finalClicked) {
       postResult();
     }
-  }, [state.finalClicked])
+  }, [state.finalClicked]);
 
   return (
     <div className={cx("battle")}>

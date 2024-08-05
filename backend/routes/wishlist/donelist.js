@@ -80,7 +80,7 @@ router.post('/delete', async (req, res) => {
     const ids = JSON.parse(req.body.id);
     const MemberId = req.body.MemberId;
     const page = req.body.page;
-    const offset = 5 * (page - 1);
+    const offset = 15 * (page - 1);
     // doneFolder의 count는 줄이고.
     await DoneFolder.decrement('count', {
       by: ids.length,
@@ -121,14 +121,17 @@ router.post('/back', async (req, res) => {
     const ids = JSON.parse(req.body.id);
     const MemberId = req.body.MemberId;
     const page = req.body.page;
-    const offset = 5 * (page - 1);
+    const offset = 15 * (page - 1);
     let items = await DoneList.findAll({
       include: [{
         model: Member,
         where: { id: MemberId },
+      }, {
+        model: Folder,
       }],
       where: { id: ids },
     });
+    console.log(ids, items);
     // 원래 있던 곳에서 삭제
     await DoneList.destroy({
       include: [{
@@ -142,10 +145,12 @@ router.post('/back', async (req, res) => {
       attributes: ['id'],
     });
     folders = folders.map(item => item.id);
+    console.log(folders);
     // 폴더가 있는 애들만 추가
     items = items.filter(item => {
       return item.Folder && folders.includes(item.Folder.id);
     });
+    console.log(items);
     const moveLists = items.map(item => {
       return List.create({
         id: item.id,
@@ -156,6 +161,7 @@ router.post('/back', async (req, res) => {
         FolderId: item.Folder.id,
       });
     });
+    console.log(moveLists);
     await Promise.all(moveLists);
     // doneFolder의 카운트는 줄이고.
     await DoneFolder.decrement('count', {
@@ -168,16 +174,19 @@ router.post('/back', async (req, res) => {
     items.forEach(item => {
       FolderIds[FolderIds.length] = item.Folder.id;
     });
+    console.log(FolderIds);
     // 그래서 { 폴더ID: 몇개, 폴더ID: 몇개.. }이런 식으로
     const obj = {};
     FolderIds.forEach(id => {
       obj[id] = (obj[id] == undefined) ? 1 : (obj[id] + 1);
     });
+    console.log(obj);
     // 바꿀 폴더 ID 배열
     const id = [];
     for(let prop in obj) {
       id[id.length] = prop;
     }
+    console.log(id);
     // 기존의 폴더를 찾아가 늘리기
     const increments = id.map(async (folderId) => {
       await Folder.increment('count', {
@@ -205,6 +214,7 @@ router.post('/back', async (req, res) => {
         author: item.author,
       }
     });
+    console.log(newDone);
     res.json({ newDone });  
   } catch(err) {
     console.error(err);

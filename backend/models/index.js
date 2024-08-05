@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 const { 
-  Book, Member, Attend, Review, Blog,
+  Book, Member, Attend, Review,
   Folder, List, DoneFolder, DoneList, Sort,
   Quote, Favorite, TS, POP, KPOP, HFC, KFC, HMC, KMC } = require('./models');
 const db = {};
@@ -13,7 +13,7 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
 
 // associate(db) 하는 애들은 1, 아니면 0
 const models = [
-  [{Book}, 1], [{Member}, 1], [{Attend}, 0], [{Review}, 1], [{Blog}, 1], 
+  [{Book}, 1], [{Member}, 1], [{Attend}, 0], [{Review}, 1], 
   [{Folder}, 1], [{List}, 1], [{DoneFolder}, 0], [{DoneList}, 1], [{Sort}, 0],
   [{Quote}, 0], [{Favorite}, 0], [{TS}, 0], [{POP}, 0], [{KPOP}, 0], [{HFC}, 0], [{KFC}, 0], [{HMC}, 0], [{KMC}, 0],
 ];
