@@ -300,10 +300,12 @@ const Battle = ({ state, dispatch }) => {
 
   useEffect(() => {
     const postResult = async () => {
-      await axios.post(`/favorite/final`, {
+      await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/favorite/final`,
+      {
         original: JSON.stringify(state.original),
         modelName: state.info.model,
-      });
+      },
+      {withCredentials: true});
     };
     if (state.finalClicked) {
       postResult();

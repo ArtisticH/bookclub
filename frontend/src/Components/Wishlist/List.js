@@ -31,7 +31,7 @@ const Add = ({ data, dispatch, ContainerDispatch }) => {
     const file = target.files[0];
     const formData = new FormData();
     formData.append("image", file);
-    const res = await axios.post("/list/preview", formData);
+    const res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/list/preview`, formData, {withCredentials: true});
     const { url } = res.data;
     setVisible(true);
     PreviewImg.current.src = url;
@@ -63,13 +63,15 @@ const Add = ({ data, dispatch, ContainerDispatch }) => {
         alert("요소를 빠짐없이 채워주세요.");
         return;
       }
-      const res = await axios.post("/list", {
+      const res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/list`,
+      {
         img,
         title,
         author,
         MemberId: member.id,
         FolderId,
-      });
+      },
+      {withCredentials: true});
       dispatch({ type: "MODAL_ADD_CANCEL" });
       const { lists } = res.data;
       // 리스트 갯수 증가시키고, 리스트 배열 바꿔치기
@@ -168,22 +170,26 @@ const Move = ({ state, data, dispatch, ContainerDispatch }) => {
       let res;
       if (page == last && lists.length === 1 && count !== 1) {
         // 마지막 페이지에서 남은 하나 삭제했을때
-        res = await axios.post(`/list/move`, {
+        res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/list/move`,
+        {
           id,
           FolderId,
           MemberId: member.id,
           targetId,
           page: page - 1,
-        });
+        },
+        {withCredentials: true});
         dispatch({ type: "PAGE", payload: page - 1 });
       } else {
-        res = await axios.post(`/list/move`, {
+        res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/list/move`,
+        {
           id,
           FolderId,
           MemberId: member.id,
           targetId,
           page,
-        });
+        },
+        {withCredentials: true});
       }
       const { newLists, others } = res.data;
       updateLists(newLists);
@@ -299,20 +305,24 @@ const Btns = ({ data, state, dispatch, ContainerDispatch }) => {
     let res;
     const id = JSON.stringify(selected);
     if (page == last && lists.length === 1 && count !== 1) {
-      res = await axios.post(`/list/delete`, {
+      res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/list/delete`,
+      {
         id,
         FolderId,
         MemberId: member.id,
         page: page - 1,
-      });
+      },
+      {withCredentials: true});
       dispatch({ type: "PAGE", payload: page - 1 });
     } else {
-      res = await axios.post(`/list/delete`, {
+      res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/list/delete`,
+      {
         id,
         FolderId,
         MemberId: member.id,
         page,
-      });
+      },
+      {withCredentials: true});
     }
     const { newLists } = res.data;
     updateLists(newLists);
@@ -333,20 +343,24 @@ const Btns = ({ data, state, dispatch, ContainerDispatch }) => {
     const id = JSON.stringify(selected);
     if (page == last && lists.length === 1 && count !== 1) {
       // 마지막 페이지에서 남은 하나 삭제했을때
-      res = await axios.post(`/list/read`, {
+      res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/list/read`,
+      {
         id,
         FolderId,
         MemberId: member.id,
         page: page - 1
-      });
+      },
+      {withCredentials: true});
       dispatch({ type: "PAGE", payload: page - 1 });
     } else {
-      res = await axios.post(`/list/read`, {
+      res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/list/read`,
+      {
         id,
         FolderId,
         MemberId: member.id,
         page,
-      });
+      },
+      {withCredentials: true});
     }
     const { newLists } = res.data;
     updateLists(newLists);
@@ -411,7 +425,8 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
       return;
     }
     dispatch({ type: "RESET_SELECTED" });
-    const res = await axios.get(`/list/page/${FolderId}/${member.id}/${page}`);
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/list/page/${FolderId}/${member.id}/${page}`,
+    {withCredentials: true});
     const lists = res.data.lists;
     updateLists(lists);
   }, [page, last]);
@@ -422,7 +437,8 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
       return;
     }
     dispatch({ type: "RESET_SELECTED" });
-    const res = await axios.get(`/list/page/${FolderId}/${member.id}/${last}`);
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/list/page/${FolderId}/${member.id}/${last}`,
+    {withCredentials: true});
     const lists = res.data.lists;
     updateLists(lists);
     dispatch({ type: "PAGE", payload: last });
@@ -434,7 +450,8 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
       return;
     }
     dispatch({ type: "RESET_SELECTED" });
-    const res = await axios.get(`/list/page/${FolderId}/${member.id}/${1}`);
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/list/page/${FolderId}/${member.id}/${1}`,
+    {withCredentials: true});
     const lists = res.data.lists;
     updateLists(lists);
     dispatch({ type: "PAGE", payload: 1 });
@@ -447,9 +464,8 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
     }
     dispatch({ type: "RESET_SELECTED" });
     const target = page != last ? page + 1 : last;
-    const res = await axios.get(
-      `/list/page/${FolderId}/${member.id}/${target}`
-    );
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/list/page/${FolderId}/${member.id}/${target}`,
+    {withCredentials: true});
     const lists = res.data.lists;
     updateLists(lists);
     dispatch({ type: "PAGE", payload: target });
@@ -462,9 +478,8 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
     }
     dispatch({ type: "RESET_SELECTED" });
     const target = page != 1 ? page - 1 : 1;
-    const res = await axios.get(
-      `/list/page/${FolderId}/${member.id}/${target}`
-    );
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/list/page/${FolderId}/${member.id}/${target}`,
+    {withCredentials: true});
     const lists = res.data.lists;
     updateLists(lists);
     dispatch({ type: "PAGE", payload: target });

@@ -19,7 +19,7 @@ const getHome = (auth, AuthUser, AuthMembers) => async (dispatch) => {
     });  
   } else {
     try {
-      const res = await axios.get(`/home`);
+      const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/home`, {withCredentials: true});
       const user = res.data.user;
       const members = res.data.members;
       if(user) { // 로그인 상태

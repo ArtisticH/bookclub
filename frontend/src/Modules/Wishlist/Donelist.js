@@ -11,7 +11,7 @@ const DELETE_DONELISTS = 'DONELIST/DELETE_DONELISTS'
 const getDonelist = (memberId) => async (dispatch) => {
   dispatch({ type: GET_DONELIST });
   try {
-    const res = await axios.get(`/donelist/${memberId}`);
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/donelist/${memberId}`, {withCredentials: true});
     const data = res.data;
     dispatch({
       type: GET_DONELIST_SUCCESS,

@@ -71,14 +71,13 @@ const LogInForm = ({ formLogin, dispatch, LogIn, members }) => {
   // 로그인을 진행할때
   const Submit = useCallback(async (e) => {
     e.preventDefault();
-    console.log("로그인");
     const email = e.target.email.value;
     const password = e.target.password.value;
     try {
-      const res = await axios.post("/auth/login", {
+      const res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/auth/login`, {
         email,
         password,
-      });
+      }, {withCredentials: true});
       CancelLogIn(); // 창을 없애고
       const success = res.data.success;
       if (success) {
@@ -146,11 +145,11 @@ const SignUpForm = ({ formSignup, dispatch }) => {
     const nick = e.target.nick.value;
     const password = e.target.password.value;
     try {
-      const res = await axios.post("/auth/signup", {
+      const res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/auth/signup`, {
         email,
         nick,
         password,
-      });
+      }, {withCredentials: true});
       CancelSignUp();
       const success = res.data.success;
       if (success) {
@@ -340,7 +339,8 @@ const Card = ({ user, LogOut, members }) => {
   }, []);
 
   const ClickLogOut = useCallback(async () => {
-    const res = await axios.get("/auth/logout");
+    
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/auth/logout`, {withCredentials: true});
     const success = res.data.success;
     if (success) {
       LogOut(members);

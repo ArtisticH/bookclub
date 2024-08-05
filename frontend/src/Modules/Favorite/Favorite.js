@@ -8,7 +8,7 @@ const GET_FAVORITE_FAILURE = "Favorite/GET_FAVORITE_FAILURE";
 export const getFavorite = () => async (dispatch) => {
   dispatch({ type: GET_FAVORITE });
   try {
-    const response = await axios.get("/favorite");
+    const response = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/favorite`, {withCredentials: true});
     dispatch({
       type: GET_FAVORITE_SUCCESS,
       payload: response.data,

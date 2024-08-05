@@ -39,11 +39,11 @@ const Add = ({ data, dispatch, ContainerDispatch }) => {
         alert("입력 요소를 다 채워주세요.");
         return;
       }
-      const res = await axios.post("/wishlist/folder", {
+      const res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/wishlist/folder`, {
         id: user.id,
         title,
         isPublic,
-      });
+      }, {withCredentials: true});
       const { folder } = res.data;
       Cancel();
       addFolder(folder);
@@ -122,10 +122,10 @@ const Change = ({ state, dispatch, ContainerDispatch }) => {
         alert("폴더명을 입력하세요");
         return;
       }
-      await axios.patch("/wishlist/folder", {
+      await axios.patch(`${process.env.REACT_APP_WAITLIST_API_URL}/wishlist/folder`, {
         id: currentFolder.id,
         title,
-      });
+      }, {withCredentials: true});
       Cancel();
       changeName(currentFolder.id, title);
     },
@@ -299,7 +299,7 @@ const FolderMenu = ({ data, state, dispatch, ContainerDispatch }) => {
       dispatch({ type: "NO_MENU_OPEN" });
       return;
     }
-    await axios.delete(`/wishlist/${currentFolder.id}/${user.id}`);
+    await axios.delete(`${process.env.REACT_APP_WAITLIST_API_URL}/wishlist/${currentFolder.id}/${user.id}`, {withCredentials: true});
     deleteFolder(currentFolder.id);
     dispatch({ type: "NO_MENU_OPEN" });
   }, [user]);
@@ -323,11 +323,11 @@ const FolderMenu = ({ data, state, dispatch, ContainerDispatch }) => {
       dispatch({ type: "NO_MENU_OPEN" });
       return;
     }
-    await axios.patch("/wishlist/public", {
+    await axios.patch(`${process.env.REACT_APP_WAITLIST_API_URL}/wishlist/public`, {
       id: currentFolder.id,
       public: change,
       done: false,
-    });
+    }, {withCredentials: true});
     changePublic(currentFolder.id, change);
     dispatch({ type: "NO_MENU_OPEN" });
   }, [currentFolder]);
@@ -390,11 +390,11 @@ const DoneFolderMenu = ({ data, state, dispatch, ContainerDispatch }) => {
       dispatch({ type: "NO_MENU_OPEN" });
       return;
     }
-    await axios.patch("/wishlist/public", {
+    await axios.patch(`${process.env.REACT_APP_WAITLIST_API_URL}/wishlist/public`, {
       id: user.id,
       public: change,
       done: true,
-    });
+    }, {withCredentials: true});
     changeDonePublic(change);
     dispatch({ type: "NO_MENU_OPEN" });
   }, [done]);
@@ -453,11 +453,11 @@ const BlankMenu = ({ data, state, dispatch, ContainerDispatch }) => {
         dispatch({ type: "NO_MENU_OPEN" });
         return;
       }
-      const res = await axios.post("/wishlist/sort", {
+      const res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/wishlist/sort`, {
         sort,
         MemberId: user.id,
         order,
-      });
+      }, {withCredentials: true});
       const { folders } = res.data;
       dispatch({ type: "NO_MENU_OPEN" });
       newFolders(folders);

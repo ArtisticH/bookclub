@@ -10,7 +10,7 @@ const UPDATE_LISTS = "APILISTS/UPDATE_LISTS";
 const getApiLists = (type) => async (dispatch) => {
   dispatch({ type: GET_APILISTS });
   try {
-    const res = await axios.get(`/open/${type}`);
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/open/${type}`, {withCredentials: true});
     const data = res.data;
     dispatch({
       type: GET_APILISTS_SUCCESS,

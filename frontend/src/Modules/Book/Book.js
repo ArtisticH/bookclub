@@ -15,7 +15,7 @@ const EDIT_REVIEW = "Book/EDIT_REVIEW"; // 리뷰 수정
 const getBook = (id) => async (dispatch) => {
   dispatch({ type: GET_BOOK });
   try {
-    const res = await axios.get(`/books/${id}`);
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/books/${id}`, {withCredentials: true});
     const data = res.data;
     dispatch({
       type: GET_BOOK_SUCCESS,

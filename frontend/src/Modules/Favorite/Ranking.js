@@ -8,7 +8,7 @@ const GET_RANKING_FAILURE = "Ranking/GET_RANKING_FAILURE";
 export const getRanking = (id) => async (dispatch) => {
   dispatch({ type: GET_RANKING });
   try {
-    const response = await axios.get(`/favorite/ranking/${id}`);
+    const response = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/favorite/ranking/${id}`, {withCredentials: true});
     dispatch({
       type: GET_RANKING_SUCCESS,
       payload: response.data,

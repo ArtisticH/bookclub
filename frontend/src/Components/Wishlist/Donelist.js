@@ -66,18 +66,22 @@ const Btns = ({ data, state, dispatch, ContainerDispatch }) => {
     let res;
     const id = JSON.stringify(selected);
     if (page == last && donelists.length === 1 && count !== 1) {
-      res = await axios.post(`/donelist/delete`, {
+      res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/donelist/delete`,
+      {
         id,
         MemberId: member.id,
         page: page - 1,
-      });
+      },
+      {withCredentials: true});
       dispatch({ type: "PAGE", payload: page - 1 });
     } else {
-      res = await axios.post(`/donelist/delete`, {
+      res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/donelist/delete`,
+      {
         id,
         MemberId: member.id,
         page,
-      });
+      },
+      {withCredentials: true});
     }
     const { newDone } = res.data;
     updateDonelists(newDone);
@@ -98,18 +102,22 @@ const Btns = ({ data, state, dispatch, ContainerDispatch }) => {
     const id = JSON.stringify(selected);
     if (page == last && donelists.length === 1 && count !== 1) {
       // 마지막 페이지에서 남은 하나 삭제했을때
-      res = await axios.post('/donelist/back', {
+      res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/donelist/back`,
+      {
         id,
         MemberId: member.id,
         page: page - 1,
-      });
+      },
+      {withCredentials: true});
       dispatch({ type: "PAGE", payload: page - 1 });
     } else {
-      res = await axios.post(`/donelist/back`, {
+      res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/donelist/back`,
+      {
         id,
         MemberId: member.id,
-        page: page,
-      });
+        page,
+      },
+      {withCredentials: true});
     }
     const { newDone } = res.data;
     updateDonelists(newDone);
@@ -147,7 +155,8 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
       alert('존재하지 않는 페이지입니다.');
       return;
     }
-    const res = await axios.get(`/list/page/${member.id}/${page}`);
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/list/page/${member.id}/${page}`,
+    {withCredentials: true});
     const { donelists } = res.data.donelists;
     updateDonelists(donelists);
   }, [page]);
@@ -157,7 +166,8 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
       alert('마지막 페이지입니다.');
       return;
     }
-    const res = await axios.get(`/list/page/${member.id}/${last}`);
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/list/page/${member.id}/${last}`,
+    {withCredentials: true});
     const { donelists } = res.data.donelists;
     updateDonelists(donelists);
     dispatch({ type: "PAGE", payload: last });
@@ -168,7 +178,8 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
       alert('첫 페이지입니다.');
       return;
     }
-    const res = await axios.get(`/list/page/${member.id}/${1}`);
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/list/page/${member.id}/${1}`,
+    {withCredentials: true});
     const { donelists } = res.data.donelists;
     updateDonelists(donelists);
     dispatch({ type: "PAGE", payload: 1 });
@@ -180,9 +191,8 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
       return;
     }
     const target = page != last ? page + 1 : last;
-    const res = await axios.get(
-      `/list/page/${member.id}/${target}`
-    );
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/list/page/${member.id}/${target}`,
+    {withCredentials: true});
     const { donelists } = res.data.donelists;
     updateDonelists(donelists);
     dispatch({ type: "PAGE", payload: target });
@@ -194,9 +204,8 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
       return;
     }
     const target = page != 1 ? page - 1 : 1;
-    const res = await axios.get(
-      `/list/page/${member.id}/${target}`
-    );
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/list/page/${member.id}/${target}`,
+    {withCredentials: true});
     const { donelists } = res.data.donelists;
     updateDonelists(donelists);
     dispatch({ type: "PAGE", payload: target });

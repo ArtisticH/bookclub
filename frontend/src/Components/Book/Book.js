@@ -220,10 +220,12 @@ const Review = ({
     let res;
     if (page == last && reviews.length === 1 && totalReview !== 1) {
       // 마지막 페이지에서 남은 하나 삭제했을때
-      res = await axios.delete(`/books/${review.id}/${BookId}/${page - 1}`);
+      res = await axios.delete(`${process.env.REACT_APP_WAITLIST_API_URL}/books/${review.id}/${BookId}/${page - 1}`,
+      {withCredentials: true});
       dispatch({ type: "PAGE", payload: page - 1 });
     } else {
-      res = await axios.delete(`/books/${review.id}/${BookId}/${page}`);
+      res = await axios.delete(`${process.env.REACT_APP_WAITLIST_API_URL}/books/${review.id}/${BookId}/${page}`,
+      {withCredentials: true});
     }
     const { starArr, starNum, newReviews } = res.data;
     updateStar(starArr, starNum);
@@ -236,10 +238,11 @@ const Review = ({
       alert("로그인 후 이용해주세요");
       return;
     }
-    const res = await axios.post(`/books/like`, {
+    const res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/books/like`, {
       ReviewId: review.id,
       MemberId: user.id,
-    });
+    },
+    {withCredentials: true});
     // 서버에서 보내온 클릭해도 되는지 안되는지 여부
     const { clickable, like } = res.data;
     if (clickable) {
@@ -360,7 +363,8 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
       alert('존재하지 않는 페이지입니다.');
       return;
     }
-    const res = await axios.get(`/books/page/${BookId}/${page}`);
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/books/page/${BookId}/${page}`,
+    {withCredentials: true});
     const reviews = res.data.reviews;
     updateReviews(reviews);
   }, [page, last]);
@@ -370,7 +374,8 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
       alert('마지막 페이지입니다.');
       return;
     }
-    const res = await axios.get(`/books/page/${BookId}/${last}`);
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/books/page/${BookId}/${last}`,
+    {withCredentials: true});
     const reviews = res.data.reviews;
     updateReviews(reviews);
     dispatch({ type: "PAGE", payload: last });
@@ -381,7 +386,8 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
       alert('첫 페이지입니다.');
       return;
     }
-    const res = await axios.get(`/books/page/${BookId}/${1}`);
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/books/page/${BookId}/${1}`,
+    {withCredentials: true});
     const reviews = res.data.reviews;
     updateReviews(reviews);
     dispatch({ type: "PAGE", payload: 1 });
@@ -393,7 +399,8 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
       return;
     }
     const target = page != last ? page + 1 : last;
-    const res = await axios.get(`/books/page/${BookId}/${target}`);
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/books/page/${BookId}/${target}`,
+    {withCredentials: true});
     const reviews = res.data.reviews;
     updateReviews(reviews);
     dispatch({ type: "PAGE", payload: target });
@@ -405,7 +412,8 @@ const Pagenation = ({ data, state, ContainerDispatch, dispatch }) => {
       return;
     }
     const target = page != 1 ? page - 1 : 1;
-    const res = await axios.get(`/books/page/${BookId}/${target}`);
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/books/page/${BookId}/${target}`,
+    {withCredentials: true});
     const reviews = res.data.reviews;
     updateReviews(reviews);
     dispatch({ type: "PAGE", payload: target });
@@ -528,14 +536,16 @@ const Form = ({
         alert("빈칸을 모두 채워주세요.");
         return;
       }
-      const res = await axios.post("/books", {
+      const res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/books`,
+      {
         title,
         text,
         overText,
         stars: star, // 상태에 저장한 별점
         BookId,
         MemberId: user.id,
-      });
+      },
+      {withCredentials: true});
       const { starArr, starNum, reviews } = res.data;
       Cancel();
       // 아래 내용은 서버에서 온 데이터를 다루는거라 따로 컨테이너에서 받아야 한다.
@@ -553,14 +563,16 @@ const Form = ({
       const title = e.target.title.value;
       const text = e.target.text.value;
       const overText = text.length > 200 ? true : false;
-      const res = await axios.patch(`/books`, {
+      const res = await axios.patch(`${process.env.REACT_APP_WAITLIST_API_URL}/books`,
+      {
         id: editReview.id, // 리뷰아이디
         title,
         text,
         overText,
         stars: star,
         BookId,
-      });
+      },
+      {withCredentials: true});
       const { review, starArr, starNum } = res.data;
       updateStar(starArr, starNum);
       // 현재 리뷰 5개에서 수정한 리뷰만 바꿔치기

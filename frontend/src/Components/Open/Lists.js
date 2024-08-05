@@ -20,10 +20,11 @@ const Pagenation = ({ state, paramsType, ContainerDispatch, dispatch }) => {
       alert('존재하지 않는 페이지입니다.');
       return;
     }
-    const res = await axios.post('/open/page', {
+    const res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/open/page`, {
       type: paramsType,
       page,
-    });
+    },
+    {withCredentials: true});
     const lists = JSON.parse(res.data.lists);
     updateLists(lists);
   }, [page, last]);
@@ -33,10 +34,11 @@ const Pagenation = ({ state, paramsType, ContainerDispatch, dispatch }) => {
       alert('마지막 페이지입니다.');
       return;
     }
-    const res = await axios.post('/open/page', {
+    const res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/open/page`, {
       type: paramsType,
       page: last,
-    });
+    },
+    {withCredentials: true});
     const lists = JSON.parse(res.data.lists);
     updateLists(lists);
     dispatch({ type: "PAGE", payload: last });
@@ -47,10 +49,11 @@ const Pagenation = ({ state, paramsType, ContainerDispatch, dispatch }) => {
       alert('첫 페이지입니다.');
       return;
     }
-    const res = await axios.post('/open/page', {
+    const res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/open/page`, {
       type: paramsType,
       page: 1,
-    });
+    },
+    {withCredentials: true});
     const lists = JSON.parse(res.data.lists);
     updateLists(lists);
     dispatch({ type: "PAGE", payload: 1 });
@@ -62,10 +65,11 @@ const Pagenation = ({ state, paramsType, ContainerDispatch, dispatch }) => {
       return;
     }
     const target = page != last ? page + 1 : last;
-    const res = await axios.post('/open/page', {
+    const res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/open/page`, {
       type: paramsType,
       page: target,
-    });
+    },
+    {withCredentials: true});
     const lists = JSON.parse(res.data.lists);
     updateLists(lists);
     dispatch({ type: "PAGE", payload: target });
@@ -77,10 +81,11 @@ const Pagenation = ({ state, paramsType, ContainerDispatch, dispatch }) => {
       return;
     }
     const target = page != 1 ? page - 1 : 1;
-    const res = await axios.post('/open/page', {
+    const res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/open/page`, {
       type: paramsType,
       page: target,
-    });
+    },
+    {withCredentials: true});
     const lists = JSON.parse(res.data.lists);
     updateLists(lists);
     dispatch({ type: "PAGE", payload: target });
@@ -130,13 +135,14 @@ const AddFolder = ({ dispatch, state, data, paramsType }) => {
       alert('모든 입력 요소를 채워주세요.');
       return;
     }
-    await axios.post('/open/add', {
+    await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/open/add`, {
       MemberId: user.id,
       title,
       isPublic,
       ids: JSON.stringify(selected),
       type: paramsType,
-    });
+    },
+    {withCredentials: true});
     Cancel();
     dispatch({ type: "RESET_SELECTED" });
     alert('폴더 생성 후 등록이 완료되었습니다!');
@@ -193,12 +199,13 @@ const Move = ({ dispatch, state, data, paramsType }) => {
       alert('이동할 폴더를 선택해주세요.');
       return;
     }
-    await axios.post('/open/exist', {
+    await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/open/exist`, {
       ids: JSON.stringify(selected),
       FolderId,
       MemberId: user.id,
       type: paramsType,
-    });
+    },
+    {withCredentials: true});
     Cancel();
     dispatch({ type: "RESET_SELECTED" });
     alert('해당 폴더에 등록이 완료되었습니다!');
@@ -292,7 +299,8 @@ const Lists = ({ data, paramsType, loading, ContainerDispatch }) => {
       return;
     }
     // 이 유저가 가진 폴더 목록들 보여주기
-    const res = await axios.get(`/open/folders/${user.id}`);
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/open/folders/${user.id}`,
+    {withCredentials: true});
     const { folders } = res.data;
     dispatch({ type: "FOLDERS", payload: folders });
     dispatch({ type: "MODAL_MOVE_OPEN" });

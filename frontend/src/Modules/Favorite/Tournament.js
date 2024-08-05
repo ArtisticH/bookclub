@@ -9,7 +9,7 @@ const GET_CATEGORY_FAILURE = "Category/GET_CATEGORY_FAILURE";
 const getCategory = (id, round) => async (dispatch) => {
   dispatch({ type: GET_CATEGORY });
   try {
-    const response = await axios.get(`/favorite/${id}/${round}`);
+    const response = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/favorite/${id}/${round}`, {withCredentials: true});
     dispatch({
       type: GET_CATEGORY_SUCCESS,
       payload: response.data,

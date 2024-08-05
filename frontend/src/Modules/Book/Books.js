@@ -8,7 +8,7 @@ const GET_BOOKS_FAILURE = "Books/GET_BOOKS_FAILURE";
 const getBooks = () => async (dispatch) => {
   dispatch({ type: GET_BOOKS });
   try {
-    const res = await axios.get('/books');
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/books`, {withCredentials: true});
     const books = res.data;
     dispatch({
       type: GET_BOOKS_SUCCESS,

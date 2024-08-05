@@ -9,7 +9,7 @@ const GET_MEMBER_FAILURE = "MEMBER/GET_MEMBER_FAILURE";
 const getMembers = () => async (dispatch) => {
   dispatch({ type: GET_MEMBER });
   try {
-    const res = await axios.get(`/members`);
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/members`, {withCredentials: true});
     const data = res.data;
     dispatch({
       type: GET_MEMBER_SUCCESS,

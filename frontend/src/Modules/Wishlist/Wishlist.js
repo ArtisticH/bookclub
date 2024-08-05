@@ -15,7 +15,7 @@ const NEW_FOLDERS = "WISH/NEW_FOLDERS";
 const getWishlist = (id) => async (dispatch) => {
   dispatch({ type: GET_WISH });
   try {
-    const res = await axios.get(`/wishlist/${id}`);
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/wishlist/${id}`, {withCredentials: true});
     const data = res.data;
     dispatch({
       type: GET_WISH_SUCCESS,

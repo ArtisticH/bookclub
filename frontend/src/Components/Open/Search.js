@@ -22,12 +22,13 @@ const AddFolder = ({ dispatch, state, user }) => {
         alert("모든 입력 요소를 채워주세요.");
         return;
       }
-      await axios.post("/open/search/add", {
+      await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/open/search/add`, {
         MemberId: user.id,
         title,
         isPublic,
         list: JSON.stringify(select),
-      });
+      },
+      {withCredentials: true});
       Cancel();
       dispatch({ type: "RESET_SELECT" });
       alert("폴더 생성 후 등록이 완료되었습니다!");
@@ -99,11 +100,12 @@ const Move = ({ dispatch, state, user }) => {
         alert("이동할 폴더를 선택해주세요.");
         return;
       }
-      await axios.post("/open/search/exist", {
+      await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/open/search/exist`, {
         list: JSON.stringify(select),
         FolderId,
         MemberId: user.id,
-      });
+      },
+      {withCredentials: true});
       Cancel();
       dispatch({ type: "RESET_SELECT" });
       alert("해당 폴더에 등록이 완료되었습니다!");
@@ -198,7 +200,8 @@ const Result = ({ list, dispatch, user }) => {
       alert("로그인 후 이용해주세요.");
       return;
     }
-    const res = await axios.get(`/open/folders/${user.id}`);
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/open/folders/${user.id}`,
+    {withCredentials: true});
     const { folders } = res.data;
     dispatch({ type: "CLICK_WISHLIST", list, folders });
   }, [user]);
@@ -252,10 +255,11 @@ const SearchZone = ({ dispatch }) => {
       alert("모든 입력 칸을 채워주세요.");
       return;
     }
-    const res = await axios.post("/open/search", {
+    const res = await axios.post(`${process.env.REACT_APP_WAITLIST_API_URL}/open/search`, {
       option,
       kwd,
-    });
+    },
+    {withCredentials: true});
     const { lists } = res.data;
     dispatch({ type: "DONE_SEARCH", lists, option, kwd });
     Input.current.value = "";

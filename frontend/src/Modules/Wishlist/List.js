@@ -13,7 +13,7 @@ const UPDATE_OTHERS = "LIST/UPDATE_OTHERS";
 const getList = (forderId, memberId) => async (dispatch) => {
   dispatch({ type: GET_LIST });
   try {
-    const res = await axios.get(`/list/${forderId}/${memberId}`);
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/list/${forderId}/${memberId}`, {withCredentials: true});
     const data = res.data;
     dispatch({
       type: GET_LIST_SUCCESS,

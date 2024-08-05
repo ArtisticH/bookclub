@@ -9,7 +9,7 @@ const GET_SEARCH_FAILURE = "SEARCH/GET_SEARCH_FAILURE";
 const getSearch = () => async (dispatch) => {
   dispatch({ type: GET_SEARCH });
   try {
-    const res = await axios.get(`/open/search`);
+    const res = await axios.get(`${process.env.REACT_APP_WAITLIST_API_URL}/open/search`, {withCredentials: true});
     const { user } = res.data;
     dispatch({
       type: GET_SEARCH_SUCCESS,
